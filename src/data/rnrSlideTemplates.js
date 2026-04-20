@@ -8,7 +8,7 @@ export const rnrSlideConfig = {
   
   // Background configuration
   background: {
-    svgPath: '/assets/rnr-bg.svg',
+    svgPath: `${import.meta.env.BASE_URL}assets/rnr-bg.svg`,
     fallbackColor: '#4736FE',
     gradientColors: ['#5168FF', '#4837FF', '#2B2199']
   },

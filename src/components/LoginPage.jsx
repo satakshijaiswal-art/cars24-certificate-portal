@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+const base = import.meta.env.BASE_URL;
+
 export default function LoginPage({ onLogin }) {
   const [showSSOPage, setShowSSOPage] = useState(false);
   const [emailInput, setEmailInput] = useState('');
@@ -139,7 +141,7 @@ export default function LoginPage({ onLogin }) {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundImage: 'url(/background.svg)',
+          backgroundImage: `url(${base}background.svg)`,
           backgroundRepeat: 'repeat',
           backgroundSize: '800px',
           opacity: 0.05,
@@ -161,9 +163,9 @@ export default function LoginPage({ onLogin }) {
       >
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: '32px', display: 'flex', justifyContent: 'center' }}>
-          <img 
-            src="/cars24-logo.png" 
-            alt="Cars24" 
+          <img
+            src={`${base}cars24-logo.png`}
+            alt="Cars24"
             style={{ height: '22px', filter: 'brightness(0) invert(1)' }}
           />
         </div>

@@ -1,3 +1,5 @@
+const base = import.meta.env.BASE_URL;
+
 export const templates = [
   {
     id: 'bar-raiser',
@@ -9,7 +11,7 @@ export const templates = [
     titleFont: 'Geist',
     bodyFont: 'Geist',
     layout: 'svg-template',
-    svgPath: '/bar-raiser.svg',
+    svgPath: `${base}bar-raiser.svg`,
   },
   {
     id: 'action-hero',
@@ -21,7 +23,7 @@ export const templates = [
     titleFont: 'Geist',
     bodyFont: 'Geist',
     layout: 'svg-template',
-    svgPath: '/action-hero.svg',
+    svgPath: `${base}action-hero.svg`,
   },
   {
     id: 'phoenix-award',
@@ -33,7 +35,7 @@ export const templates = [
     titleFont: 'Geist',
     bodyFont: 'Geist',
     layout: 'svg-template',
-    svgPath: '/phoenix-award.svg',
+    svgPath: `${base}phoenix-award.svg`,
   },
   {
     id: 'glue-award',
@@ -45,7 +47,7 @@ export const templates = [
     titleFont: 'Geist',
     bodyFont: 'Geist',
     layout: 'svg-template',
-    svgPath: '/glue-award.svg',
+    svgPath: `${base}glue-award.svg`,
   },
   {
     id: 'culture-champion',
@@ -57,7 +59,7 @@ export const templates = [
     titleFont: 'Geist',
     bodyFont: 'Geist',
     layout: 'svg-template',
-    svgPath: '/culture-champion.svg',
+    svgPath: `${base}culture-champion.svg`,
   },
   {
     id: 'rock-award',
@@ -69,7 +71,7 @@ export const templates = [
     titleFont: 'Geist',
     bodyFont: 'Geist',
     layout: 'svg-template',
-    svgPath: '/rock-award.svg',
+    svgPath: `${base}rock-award.svg`,
   },
   {
     id: 'dream-builder',
@@ -81,6 +83,6 @@ export const templates = [
     titleFont: 'Geist',
     bodyFont: 'Geist',
     layout: 'svg-template',
-    svgPath: '/dream-builder.svg',
+    svgPath: `${base}dream-builder.svg`,
   },
 ];

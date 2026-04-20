@@ -1,8 +1,10 @@
 import { useState, useRef } from 'react';
 
+const base = import.meta.env.BASE_URL;
+
 const signaturePresets = [
-  { id: 'vc', name: 'Vikram Chopra', title: 'CEO & CO-FOUNDER', imagePath: '/vc.svg' },
-  { id: 'ruchit', name: 'Ruchit Agarwal', title: 'CFO & CO-FOUNDER', imagePath: '/ruchit.svg' },
+  { id: 'vc', name: 'Vikram Chopra', title: 'CEO & CO-FOUNDER', imagePath: `${base}vc.svg` },
+  { id: 'ruchit', name: 'Ruchit Agarwal', title: 'CFO & CO-FOUNDER', imagePath: `${base}ruchit.svg` },
 ];
 
 export default function EditPanel({ formData, onFormChange, onSignatureUpload, globalSignature, onGlobalSignatureChange, hasCertificateSelected, onSignatureClick, selectedCertificateId }) {

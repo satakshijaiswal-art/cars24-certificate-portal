@@ -1,9 +1,11 @@
 import { forwardRef } from 'react';
 
+const base = import.meta.env.BASE_URL;
+
 const RaiseStandardsBadge = () => (
-  <img 
-    src="/raise-standards-badge.png" 
-    alt="Raise Standards Badge" 
+  <img
+    src={`${base}raise-standards-badge.png`}
+    alt="Raise Standards Badge"
     style={{ width: '156px', height: '156px' }}
   />
 );
@@ -16,16 +18,16 @@ const BarRaiserLayout = ({ template, formData }) => {
     >
       {/* Cars24 Logo */}
       <div style={{ marginBottom: '48px' }}>
-        <img 
-          src="/cars24-logo.png" 
-          alt="Cars24 Logo" 
+        <img
+          src={`${base}cars24-logo.png`}
+          alt="Cars24 Logo"
           style={{ height: '32px', width: '150.76px', objectFit: 'contain' }}
         />
       </div>
 
       {/* Stars and Line - Top */}
       <div style={{ marginBottom: '12px' }}>
-        <img src="/stars.png" alt="Stars" style={{ height: '24px', objectFit: 'contain' }} />
+        <img src={`${base}stars.png`} alt="Stars" style={{ height: '24px', objectFit: 'contain' }} />
       </div>
 
       {/* Bar Raiser Title */}
@@ -42,7 +44,7 @@ const BarRaiserLayout = ({ template, formData }) => {
 
       {/* Stars and Line - Bottom */}
       <div style={{ marginBottom: '32px' }}>
-        <img src="/stars.png" alt="Stars" style={{ height: '24px', objectFit: 'contain' }} />
+        <img src={`${base}stars.png`} alt="Stars" style={{ height: '24px', objectFit: 'contain' }} />
       </div>
 
       {/* Recipient Name */}

@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FileSpreadsheet, Download, ChevronDown, ChevronUp, ArrowLeft, Upload, Image, Trash2 } from 'lucide-react';
+
+const base = import.meta.env.BASE_URL;
 import * as XLSX from 'xlsx';
 import JSZip from 'jszip';
 import jsPDF from 'jspdf';
@@ -930,7 +932,7 @@ function PPTCreator({ onBack }) {
                   className="slide-preview"
                   data-slide-index={1}
                   style={{
-                    backgroundImage: 'url(/assets/bg.svg)',
+                    backgroundImage: `url(${base}assets/bg.svg)`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     backgroundRepeat: 'no-repeat',
@@ -963,7 +965,7 @@ function PPTCreator({ onBack }) {
 
                   {/* Cars24 Logo - positioned at top center */}
                   <img 
-                    src="/assets/logo.png"
+                    src={`${base}assets/logo.png`}
                     alt="Cars24 Logo"
                     style={{
                       position: 'absolute',
@@ -1034,7 +1036,7 @@ function PPTCreator({ onBack }) {
                           className="slide-preview"
                           data-slide-index={globalSlideIndex}
                           style={{
-                            backgroundImage: 'url(/assets/template-bg.svg)',
+                            backgroundImage: `url(${base}assets/template-bg.svg)`,
                             backgroundSize: 'cover',
                             backgroundPosition: 'center',
                             backgroundRepeat: 'no-repeat',
@@ -1331,7 +1333,7 @@ function PPTCreator({ onBack }) {
                   className="slide-preview"
                   data-slide-index={totalSlides}
                   style={{
-                    backgroundImage: 'url(/assets/bg.svg)',
+                    backgroundImage: `url(${base}assets/bg.svg)`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     backgroundRepeat: 'no-repeat',
@@ -1365,7 +1367,7 @@ function PPTCreator({ onBack }) {
 
                   {/* Cars24 Logo - positioned at top center */}
                   <img 
-                    src="/assets/logo.png"
+                    src={`${base}assets/logo.png`}
                     alt="Cars24 Logo"
                     style={{
                       position: 'absolute',

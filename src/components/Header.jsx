@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { User, LogOut } from 'lucide-react';
 
+const base = import.meta.env.BASE_URL;
+
 export default function Header({ user, onLogout }) {
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -22,9 +24,9 @@ export default function Header({ user, onLogout }) {
       }}
     >
       {/* Cars24 Logo - Left Side */}
-      <img 
-        src="/cars24-logo.png" 
-        alt="Cars24" 
+      <img
+        src={`${base}cars24-logo.png`}
+        alt="Cars24"
         style={{ height: '20px' }}
       />
 
