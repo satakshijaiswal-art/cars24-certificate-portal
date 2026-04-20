@@ -1,0 +1,24 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/api/remove-bg"
+  to = "/.netlify/functions/remove-bg"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/remove-bg-batch"
+  to = "/.netlify/functions/remove-bg-batch"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
