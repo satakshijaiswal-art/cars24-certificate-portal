@@ -346,6 +346,35 @@ export default function JDCreator({ onBack }) {
           </select>
         </Field>
 
+        <div style={{ ...sectionHeadStyle, marginTop: '8px' }}>Editorial Details</div>
+
+        <Field label="Eyebrow Text">
+          <input
+            style={inputStyle}
+            value={form.eyebrow}
+            onChange={(e) => updateField('eyebrow', e.target.value)}
+            placeholder="Cars24 · Hiring · 2026"
+          />
+        </Field>
+
+        <Field label="One-line Hook / Tagline">
+          <input
+            style={inputStyle}
+            value={form.hook}
+            onChange={(e) => updateField('hook', e.target.value)}
+            placeholder="Build what moves millions."
+          />
+        </Field>
+
+        <Field label="Pull-quote / Stat (optional)">
+          <input
+            style={inputStyle}
+            value={form.pullQuote}
+            onChange={(e) => updateField('pullQuote', e.target.value)}
+            placeholder="Join 8,000+ Carters shaping the future..."
+          />
+        </Field>
+
         <div style={{ ...sectionHeadStyle, marginTop: '8px' }}>Content</div>
 
         <Field label="About the Role">

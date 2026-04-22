@@ -1118,17 +1118,90 @@ const motifComponents = {
   anniversary: AnniversaryMotif,
 };
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// FESTIVAL WISHES CANVAS — per-festival full-bleed design
-// ═══════════════════════════════════════════════════════════════════════════════
+// ─── Font stacks (poster canvas) ─────────────────────────────────────────────
+const FONT_DISPLAY_POSTER = "'Playfair Display', Georgia, serif";
+const FONT_FRAUNCES_POSTER = "'Fraunces', Georgia, serif";
 
-// Determine if a background is dark (needs white text for Cars24 wordmark)
-// All festival templates now use pale purple / off-white backgrounds → always light
-const isDarkBg = (template) => {
-  // Event announcements use dark purple header strip — logo appears there in white already
-  // Festival templates are all pale/light now
-  return false;
-};
+// ─── Editorial label strip ────────────────────────────────────────────────────
+const LabelStrip = ({ children, accentColor }) => (
+  <div style={{
+    display: 'inline-block',
+    background: accentColor,
+    borderRadius: '3px',
+    padding: '3px 10px',
+    marginBottom: '14px',
+  }}>
+    <span style={{
+      color: '#FFFFFF',
+      fontSize: '8px',
+      fontWeight: '700',
+      letterSpacing: '2.5px',
+      textTransform: 'uppercase',
+      fontFamily: FONT_SANS,
+    }}>{children}</span>
+  </div>
+);
+
+// ─── Diagonal accent ribbon ───────────────────────────────────────────────────
+const DiagonalRibbon = ({ accentColor }) => (
+  <div style={{
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    width: '120px',
+    height: '120px',
+    overflow: 'hidden',
+    zIndex: 1,
+    pointerEvents: 'none',
+  }}>
+    <div style={{
+      position: 'absolute',
+      top: '28px',
+      right: '-32px',
+      width: '130px',
+      height: '22px',
+      background: `linear-gradient(135deg, ${accentColor}CC, ${accentColor}88)`,
+      transform: 'rotate(45deg)',
+    }} />
+  </div>
+);
+
+// ─── Layered shape decorations ────────────────────────────────────────────────
+const LayeredCircles = ({ accentColor }) => (
+  <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 1, overflow: 'hidden' }}>
+    <div style={{
+      position: 'absolute', right: '-60px', top: '80px',
+      width: '260px', height: '260px', borderRadius: '50%',
+      background: accentColor, opacity: 0.05,
+    }} />
+    <div style={{
+      position: 'absolute', right: '-30px', top: '120px',
+      width: '180px', height: '180px', borderRadius: '50%',
+      border: `2px solid ${accentColor}`, opacity: 0.1,
+    }} />
+    <div style={{
+      position: 'absolute', left: '-80px', bottom: '140px',
+      width: '200px', height: '200px', borderRadius: '50%',
+      background: accentColor, opacity: 0.06,
+    }} />
+  </div>
+);
+
+// ─── Purple-on-purple contrast block ─────────────────────────────────────────
+const PurpleBlock = ({ children, style = {} }) => (
+  <div style={{
+    background: 'linear-gradient(135deg, #4A35FE 0%, #6B57FF 100%)',
+    borderRadius: '6px',
+    padding: '14px 22px',
+    ...style,
+  }}>
+    {children}
+  </div>
+);
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// FESTIVAL WISHES CANVAS — editorial per-festival design
+// ═══════════════════════════════════════════════════════════════════════════════
 
 const FestivalWishesCanvas = ({ template, formData }) => {
   const MotifComponent = motifComponents[template.motif] || DefaultFestivalMotif;
@@ -1140,51 +1213,38 @@ const FestivalWishesCanvas = ({ template, formData }) => {
   const footerText    = formData.footerText?.trim()    || 'With warm wishes from Team Cars24';
 
   const fontStack   = template.fontStack   || FONT_SANS;
-  const textColor   = template.textColor   || '#1A1A1A';
-  const bodyText    = template.bodyTextColor || '#4A4A4A';
   const accentColor = template.accentColor || '#4A35FE';
   const accent2     = template.accentColor2 || accentColor;
   const posterBg    = template.posterBg    || '#FFFFFF';
-  const dark        = isDarkBg(template);
 
-  // Headline effect → CSS style additions
-  const headlineStyle = (() => {
-    switch (template.headlineEffect) {
-      case 'brand-purple':
-        return { color: '#4A35FE', textShadow: '0 2px 12px rgba(74,53,254,0.18)' };
-      case 'gold-glow':
-        return { color: accentColor, textShadow: `0 0 40px ${accentColor}88, 0 2px 4px rgba(0,0,0,0.4)` };
-      case 'gold-serif':
-        return { color: accentColor, textShadow: `0 1px 2px rgba(0,0,0,0.3)` };
-      case 'christmas-red':
-        return { color: template.accentColor, textShadow: '0 2px 8px rgba(179,27,27,0.3)' };
-      case 'tricolour':
-        return { color: template.textColor, textShadow: '0 2px 8px rgba(0,0,128,0.2)' };
-      case 'rose-gold':
-        return { color: template.textColor, textShadow: '0 2px 8px rgba(212,96,122,0.25)' };
-      case 'saffron-dark':
-        return { color: template.textColor, textShadow: '0 2px 6px rgba(139,0,0,0.3)' };
-      case 'dark-on-orange':
-        return { color: template.textColor, textShadow: '0 1px 4px rgba(0,0,0,0.2)' };
-      case 'white-on-vivid':
-        return { color: '#FFFFFF', textShadow: '0 2px 12px rgba(0,0,0,0.3)' };
-      case 'kerala-green':
-        return { color: template.textColor, textShadow: '0 2px 6px rgba(27,94,32,0.2)' };
-      case 'harvest-brown':
-        return { color: template.textColor, textShadow: '0 1px 4px rgba(107,40,0,0.15)' };
-      case 'wheat-gold':
-        return { color: template.textColor, textShadow: '0 2px 6px rgba(92,40,0,0.2)' };
-      case 'fire-glow':
-        return { color: accentColor, textShadow: `0 0 30px ${accentColor}99, 0 2px 4px rgba(0,0,0,0.5)` };
-      case 'lavender-glow':
-        return { color: template.textColor, textShadow: '0 0 20px rgba(200,168,216,0.4)' };
-      case 'serene-gold':
-        return { color: template.textColor, textShadow: '0 1px 4px rgba(0,0,0,0.1)' };
-      case 'multicolor':
-        return { color: '#CC0066', textShadow: '2px 2px 0 #FFD700, -1px -1px 0 #00CED1' };
-      default:
-        return { color: textColor };
+  // Choose editorial layout variant per template id
+  const layoutVariant = (() => {
+    switch (template.id) {
+      case 'diwali':          return 'glow-centre';
+      case 'holi':            return 'asymmetric-splash';
+      case 'eid-ul-fitr':
+      case 'eid-al-adha':     return 'crescent-editorial';
+      case 'christmas':       return 'ornament-split';
+      case 'new-year':        return 'oversized-year';
+      case 'independence-day':
+      case 'republic-day':    return 'national-pride';
+      case 'navratri':        return 'mandala-editorial';
+      case 'lohri':           return 'fire-glow';
+      default:                return 'classic-editorial';
     }
+  })();
+
+  // Display font choice
+  const displayFont = (() => {
+    if (fontStack.includes('Fraunces')) return FONT_FRAUNCES_POSTER;
+    if (fontStack.includes('Playfair')) return FONT_DISPLAY_POSTER;
+    return FONT_DISPLAY_POSTER;
+  })();
+
+  // Headline size — bump up all templates
+  const hlSize = (() => {
+    const base = parseInt(template.headlineFontSize || '52', 10);
+    return Math.min(86, base + 18) + 'px';
   })();
 
   return (
@@ -1203,124 +1263,207 @@ const FestivalWishesCanvas = ({ template, formData }) => {
         <MotifComponent accentColor={accentColor} accentColor2={accent2} secondaryColor={template.secondaryColor || accent2} />
       </div>
 
-      {/* ── Small Cars24 wordmark — top-left corner, unobtrusive ── */}
+      {/* Layered background circles for depth */}
+      <LayeredCircles accentColor={accentColor} />
+
+      {/* Diagonal ribbon accent — top-right corner */}
+      <DiagonalRibbon accentColor={accentColor} />
+
+      {/* ── Cars24 logo — top-left, prominent ── */}
       <div style={{
         position: 'absolute',
-        top: '20px',
-        left: '28px',
+        top: '22px',
+        left: '30px',
         zIndex: 10,
         display: 'flex',
         alignItems: 'center',
         gap: '6px',
       }}>
-        {dark ? <Cars24LogoWhite /> : <Cars24LogoDark />}
+        <Cars24LogoDark />
       </div>
 
-      {/* ── Main content — centred column ── */}
+      {/* ── Editorial label strip — top-right ── */}
+      <div style={{
+        position: 'absolute',
+        top: '26px',
+        right: '30px',
+        zIndex: 10,
+      }}>
+        <div style={{
+          border: `1.5px solid ${accentColor}`,
+          borderRadius: '3px',
+          padding: '3px 10px',
+        }}>
+          <span style={{
+            color: accentColor,
+            fontSize: '7.5px',
+            fontWeight: '700',
+            letterSpacing: '2px',
+            textTransform: 'uppercase',
+            fontFamily: FONT_SANS,
+          }}>We're Celebrating</span>
+        </div>
+      </div>
+
+      {/* ── Main content ── */}
       <div style={{
         position: 'relative',
         zIndex: 5,
         flex: 1,
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '80px 60px 60px',
+        padding: '90px 52px 24px',
         boxSizing: 'border-box',
+        justifyContent: layoutVariant === 'oversized-year' ? 'flex-start' : 'center',
       }}>
-        {/* Dear */}
+
+        {/* "DEAR" small caps */}
         <p style={{
-          color: dark ? `${accentColor}CC` : `${textColor}99`,
-          fontSize: '13px',
-          fontWeight: '500',
-          margin: '0 0 4px 0',
-          letterSpacing: '2px',
+          color: `${accentColor}99`,
+          fontSize: '11px',
+          fontWeight: '700',
+          margin: '0 0 3px 0',
+          letterSpacing: '3px',
           textTransform: 'uppercase',
           fontFamily: FONT_SANS,
+          textAlign: layoutVariant === 'asymmetric-splash' ? 'left' : 'center',
         }}>
           Dear
         </p>
 
         {/* Recipient name */}
         <h2 style={{
-          color: dark ? accentColor : (template.id === 'independence-day' || template.id === 'republic-day' ? '#000080' : accentColor),
-          fontSize: '26px',
+          color: accentColor,
+          fontSize: '24px',
           fontWeight: '700',
-          textAlign: 'center',
-          margin: '0 0 20px 0',
+          textAlign: layoutVariant === 'asymmetric-splash' ? 'left' : 'center',
+          margin: '0 0 18px 0',
           fontFamily: FONT_SANS,
           letterSpacing: '-0.2px',
         }}>
           {recipientName}
         </h2>
 
-        {/* Decorative divider line */}
+        {/* Decorative rule */}
         <div style={{
-          width: '80px',
-          height: '2px',
-          background: `linear-gradient(90deg, transparent, ${accentColor}, transparent)`,
-          borderRadius: '2px',
-          marginBottom: '22px',
-          opacity: 0.7,
-        }} />
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          marginBottom: '20px',
+          justifyContent: layoutVariant === 'asymmetric-splash' ? 'flex-start' : 'center',
+        }}>
+          <div style={{ width: '40px', height: '1.5px', background: `linear-gradient(90deg, transparent, ${accentColor})`, borderRadius: '1px' }} />
+          <span style={{ color: accentColor, fontSize: '10px', opacity: 0.7 }}>✦</span>
+          <div style={{ width: '40px', height: '1.5px', background: `linear-gradient(90deg, ${accentColor}, transparent)`, borderRadius: '1px' }} />
+        </div>
+
+        {/* Oversized year number — for New Year layout */}
+        {layoutVariant === 'oversized-year' && (
+          <div style={{
+            fontSize: '110px',
+            fontWeight: '900',
+            lineHeight: '0.9',
+            fontFamily: FONT_DISPLAY_POSTER,
+            letterSpacing: '-4px',
+            background: `linear-gradient(135deg, #4A35FE, #8B7BFF)`,
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            marginBottom: '8px',
+            textAlign: 'center',
+          }}>2027</div>
+        )}
 
         {/* Festival headline — THE HERO */}
-        <h1 style={{
-          fontSize: template.headlineFontSize || '48px',
-          fontWeight: template.headlineWeight || '700',
-          textAlign: 'center',
-          margin: '0 0 18px 0',
-          lineHeight: '1.1',
-          letterSpacing: '-0.5px',
-          fontFamily: fontStack,
-          maxWidth: '460px',
-          ...headlineStyle,
+        <div style={{
+          textAlign: layoutVariant === 'asymmetric-splash' ? 'left' : 'center',
+          marginBottom: '10px',
         }}>
-          {headline}
-        </h1>
+          {/* Open quote for ornament-split / crescent layouts */}
+          {(layoutVariant === 'ornament-split' || layoutVariant === 'crescent-editorial') && (
+            <span style={{
+              fontSize: '72px',
+              lineHeight: '0.5',
+              color: accentColor,
+              opacity: 0.25,
+              fontFamily: FONT_DISPLAY_POSTER,
+              display: 'block',
+              marginBottom: '-8px',
+              textAlign: 'center',
+            }}>"</span>
+          )}
+          <h1 style={{
+            fontSize: hlSize,
+            fontWeight: template.headlineWeight || '800',
+            textAlign: layoutVariant === 'asymmetric-splash' ? 'left' : 'center',
+            margin: '0',
+            lineHeight: '1.05',
+            letterSpacing: '-1px',
+            fontFamily: displayFont,
+            maxWidth: layoutVariant === 'asymmetric-splash' ? '340px' : '490px',
+            background: `linear-gradient(135deg, #4A35FE 0%, #6B57FF 60%, #8B7BFF 100%)`,
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            textShadow: 'none',
+          }}>
+            {headline}
+          </h1>
+        </div>
 
         {/* Accent ornament below headline */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
-          marginBottom: '24px',
-          opacity: 0.6,
+          margin: '14px 0 18px',
+          justifyContent: layoutVariant === 'asymmetric-splash' ? 'flex-start' : 'center',
         }}>
-          <div style={{ width: '30px', height: '1.5px', background: accentColor, borderRadius: '1px' }} />
-          <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: accentColor }} />
-          <div style={{ width: '30px', height: '1.5px', background: accentColor, borderRadius: '1px' }} />
+          <div style={{ width: '50px', height: '2px', background: `linear-gradient(90deg, ${accentColor}, transparent)`, borderRadius: '1px' }} />
+          <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: accentColor, opacity: 0.7 }} />
+          <div style={{ width: '50px', height: '2px', background: `linear-gradient(90deg, transparent, ${accentColor})`, borderRadius: '1px' }} />
         </div>
 
         {/* Uploaded image */}
         <UploadedImageBlock src={formData.uploadedImage} />
 
-        {/* Message */}
-        <p style={{
-          color: bodyText,
-          fontSize: '13.5px',
-          lineHeight: '1.85',
-          textAlign: 'center',
-          maxWidth: '430px',
-          margin: '0',
-          fontFamily: FONT_SANS,
+        {/* Message — wrapped in editorial quote block */}
+        <div style={{
+          background: 'rgba(255,255,255,0.7)',
+          backdropFilter: 'blur(6px)',
+          borderRadius: '8px',
+          padding: '16px 22px',
+          border: `1px solid ${accentColor}20`,
+          borderLeft: `3px solid ${accentColor}`,
+          maxWidth: '440px',
+          alignSelf: layoutVariant === 'asymmetric-splash' ? 'flex-start' : 'center',
         }}>
-          {message}
-        </p>
+          <p style={{
+            color: '#4A4A4A',
+            fontSize: '12.5px',
+            lineHeight: '1.85',
+            textAlign: layoutVariant === 'asymmetric-splash' ? 'left' : 'center',
+            margin: '0',
+            fontFamily: FONT_SANS,
+          }}>
+            {message}
+          </p>
+        </div>
 
         {/* Signatory block */}
         {(fromName || fromTitle) && (
           <div style={{
-            textAlign: 'center',
-            marginTop: '24px',
-            paddingTop: '16px',
-            borderTop: `1px solid ${accentColor}30`,
-            width: '80%',
+            textAlign: layoutVariant === 'asymmetric-splash' ? 'left' : 'center',
+            marginTop: '20px',
+            paddingTop: '14px',
+            borderTop: `1px solid ${accentColor}22`,
+            width: layoutVariant === 'asymmetric-splash' ? 'auto' : '80%',
+            alignSelf: layoutVariant === 'asymmetric-splash' ? 'flex-start' : 'center',
           }}>
             {fromName && (
               <p style={{
-                color: dark ? accentColor : textColor,
-                fontSize: '14px',
+                color: accentColor,
+                fontSize: '13px',
                 fontWeight: '600',
                 margin: '0 0 2px 0',
                 fontFamily: FONT_SANS,
@@ -1330,7 +1473,7 @@ const FestivalWishesCanvas = ({ template, formData }) => {
             )}
             {fromTitle && (
               <p style={{
-                color: bodyText,
+                color: '#4A4A4A',
                 fontSize: '11px',
                 margin: 0,
                 letterSpacing: '0.5px',
@@ -1343,7 +1486,7 @@ const FestivalWishesCanvas = ({ template, formData }) => {
         )}
       </div>
 
-      {/* ── Tasteful footer — Cars24 attribution, not a banner ── */}
+      {/* ── Footer — purple band with footerText ── */}
       <div style={{
         position: 'relative',
         zIndex: 10,
@@ -1352,29 +1495,30 @@ const FestivalWishesCanvas = ({ template, formData }) => {
         boxSizing: 'border-box',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center',
-        background: dark ? 'rgba(0,0,0,0.35)' : 'rgba(255,255,255,0.55)',
-        backdropFilter: 'blur(4px)',
+        justifyContent: 'space-between',
+        background: `linear-gradient(90deg, ${accentColor}18, ${accentColor}08)`,
+        borderTop: `1px solid ${accentColor}22`,
         flexShrink: 0,
       }}>
         <p style={{
-          color: dark ? `rgba(255,255,255,0.65)` : `rgba(0,0,0,0.45)`,
-          fontSize: '9.5px',
+          color: `rgba(74,53,254,0.55)`,
+          fontSize: '9px',
           letterSpacing: '2px',
           textTransform: 'uppercase',
           margin: 0,
-          fontWeight: '500',
+          fontWeight: '600',
           fontFamily: FONT_SANS,
         }}>
           {footerText}
         </p>
+        <span style={{ color: `${accentColor}44`, fontSize: '9px', fontFamily: FONT_SANS }}>✦</span>
       </div>
     </div>
   );
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// EVENT ANNOUNCEMENT CANVAS — Cars24 purple-led (unchanged approach)
+// EVENT ANNOUNCEMENT CANVAS — full editorial magazine treatment
 // ═══════════════════════════════════════════════════════════════════════════════
 const EventAnnouncementCanvas = ({ template, formData }) => {
   const MotifComponent = motifComponents[template.motif] || DefaultFestivalMotif;
@@ -1382,6 +1526,14 @@ const EventAnnouncementCanvas = ({ template, formData }) => {
   const subheadline  = formData.subheadline?.trim()  || 'You are invited';
   const description  = formData.description          || template.defaultDescription;
   const footerText   = formData.footerText?.trim()   || 'Cars24 People Team';
+
+  const eventDate = formData.eventDate ? (() => {
+    const d = new Date(formData.eventDate + 'T00:00:00');
+    const day = d.toLocaleDateString('en-IN', { day: '2-digit' });
+    const mon = d.toLocaleDateString('en-IN', { month: 'short' }).toUpperCase();
+    const yr  = d.getFullYear();
+    return { day, mon, yr, full: formatDate(formData.eventDate) };
+  })() : null;
 
   return (
     <div style={{
@@ -1394,101 +1546,225 @@ const EventAnnouncementCanvas = ({ template, formData }) => {
       display: 'flex',
       flexDirection: 'column',
     }}>
-      {/* Purple header strip */}
+      {/* Subtle dot-grid pattern background */}
+      <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 0, pointerEvents: 'none' }}
+        viewBox="0 0 595 842" preserveAspectRatio="xMidYMid slice">
+        {Array.from({ length: 18 }).map((_, row) =>
+          Array.from({ length: 14 }).map((_, col) => (
+            <circle key={`${row}-${col}`}
+              cx={30 + col * 40} cy={170 + row * 40} r="1.5"
+              fill={BRAND.primary} opacity="0.07" />
+          ))
+        )}
+      </svg>
+
+      {/* Purple hero block — top ~40% */}
       <div style={{
         background: BRAND.headerGrad,
         width: '100%',
-        minHeight: '150px',
-        padding: '22px 36px 24px',
+        padding: '24px 38px 28px',
         boxSizing: 'border-box',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'space-between',
         flexShrink: 0,
         position: 'relative',
         zIndex: 2,
+        overflow: 'hidden',
+        minHeight: '310px',
       }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        {/* Decorative rings inside hero */}
+        <div style={{
+          position: 'absolute', right: '-70px', top: '-70px',
+          width: '320px', height: '320px', borderRadius: '50%',
+          border: '2px solid rgba(255,255,255,0.09)', pointerEvents: 'none',
+        }} />
+        <div style={{
+          position: 'absolute', right: '-30px', top: '-30px',
+          width: '200px', height: '200px', borderRadius: '50%',
+          background: 'rgba(255,255,255,0.04)', pointerEvents: 'none',
+        }} />
+        <div style={{
+          position: 'absolute', left: '0', bottom: '0', right: '0',
+          height: '80px',
+          background: 'linear-gradient(180deg, transparent, rgba(46,31,204,0.3))',
+          pointerEvents: 'none',
+        }} />
+
+        {/* Logo row + "We're Hiring" / "You're Invited" badge */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', position: 'relative', zIndex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center' }}><Cars24LogoWhite /></div>
-          <span style={{ color: 'rgba(255,255,255,0.65)', fontSize: '10px', letterSpacing: '3px', textTransform: 'uppercase', fontWeight: '500' }}>
-            {subheadline}
-          </span>
+          <div style={{
+            background: 'rgba(255,255,255,0.14)',
+            border: '1px solid rgba(255,255,255,0.22)',
+            borderRadius: '20px', padding: '4px 14px',
+          }}>
+            <span style={{ color: '#FFFFFF', fontSize: '8px', fontWeight: '700', letterSpacing: '2px', textTransform: 'uppercase', fontFamily: FONT_SANS }}>
+              {subheadline}
+            </span>
+          </div>
         </div>
-        <div>
-          <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '10px', letterSpacing: '3px', textTransform: 'uppercase', margin: '12px 0 6px 0', fontWeight: '500' }}>
-            Cars24 Presents
-          </p>
-          <h1 style={{ color: '#FFFFFF', fontSize: '32px', fontWeight: '800', lineHeight: '1.15', margin: '0', letterSpacing: '-0.5px', maxWidth: '480px' }}>
-            {eventTitle}
-          </h1>
-          <div style={{ width: '48px', height: '3px', background: template.accentColor, borderRadius: '2px', marginTop: '10px', opacity: 0.9 }} />
-        </div>
+
+        {/* Editorial label */}
+        <p style={{
+          color: 'rgba(255,255,255,0.55)',
+          fontSize: '9px',
+          fontWeight: '700',
+          letterSpacing: '2.5px',
+          textTransform: 'uppercase',
+          margin: '0 0 10px 0',
+          fontFamily: FONT_SANS,
+          position: 'relative', zIndex: 1,
+        }}>
+          Cars24 Presents
+        </p>
+
+        {/* Event title — oversized editorial Playfair */}
+        <h1 style={{
+          color: '#FFFFFF',
+          fontSize: '52px',
+          fontWeight: '800',
+          lineHeight: '1.05',
+          margin: '0 0 16px 0',
+          letterSpacing: '-1px',
+          maxWidth: '480px',
+          fontFamily: FONT_DISPLAY_POSTER,
+          position: 'relative', zIndex: 1,
+        }}>
+          {eventTitle}
+        </h1>
+
+        {/* Date displayed as hero element */}
+        {eventDate && (
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '12px',
+            position: 'relative', zIndex: 1,
+          }}>
+            <div style={{
+              background: 'rgba(255,255,255,0.14)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              borderRadius: '6px',
+              padding: '8px 16px',
+              textAlign: 'center',
+            }}>
+              <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '8px', fontWeight: '700', letterSpacing: '1.5px', textTransform: 'uppercase', margin: '0 0 3px 0', fontFamily: FONT_SANS }}>
+                {eventDate.mon}
+              </p>
+              <p style={{ color: '#FFFFFF', fontSize: '28px', fontWeight: '900', margin: '0', lineHeight: '1', fontFamily: FONT_DISPLAY_POSTER, letterSpacing: '-0.5px' }}>
+                {eventDate.day}
+              </p>
+              <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: '9px', margin: '2px 0 0', fontFamily: FONT_SANS }}>
+                {eventDate.yr}
+              </p>
+            </div>
+            <div style={{ width: '1px', height: '50px', background: 'rgba(255,255,255,0.2)' }} />
+            <div>
+              {formData.eventTime && (
+                <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '12px', fontWeight: '600', margin: '0 0 4px', fontFamily: FONT_SANS }}>
+                  {formData.eventTime}
+                </p>
+              )}
+              {formData.venue && (
+                <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '11px', margin: 0, fontFamily: FONT_SANS }}>
+                  {formData.venue}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Thin accent bar */}
+        <div style={{
+          width: '60px', height: '3px',
+          background: template.accentColor || 'rgba(255,255,255,0.5)',
+          borderRadius: '2px',
+          marginTop: '14px',
+          position: 'relative', zIndex: 1,
+        }} />
       </div>
+
+      {/* Gradient transition */}
+      <div style={{ height: '4px', background: `linear-gradient(90deg, ${BRAND.primary}, #8B7BFF, transparent)`, flexShrink: 0, zIndex: 2 }} />
 
       {/* White body area */}
       <div style={{
         flex: 1,
-        background: BRAND.bodyWash,
         position: 'relative',
         display: 'flex',
         flexDirection: 'column',
-        padding: `32px ${LAYOUT.bodyPadHEv}px 0`,
+        padding: '24px 38px 0',
         boxSizing: 'border-box',
         overflow: 'hidden',
+        zIndex: 1,
       }}>
         <MotifComponent accentColor={template.accentColor} secondaryColor={template.secondaryColor} />
         <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', flex: 1 }}>
-          <p style={{ color: BRAND.textSecond, fontSize: '14.5px', lineHeight: '1.75', margin: '0 0 24px 0', maxWidth: '460px' }}>
+
+          {/* Description text */}
+          <p style={{ color: BRAND.textSecond, fontSize: '13.5px', lineHeight: '1.8', margin: '0 0 20px 0', maxWidth: '460px', fontFamily: FONT_SANS }}>
             {description}
           </p>
+
+          {/* Uploaded image */}
           {formData.uploadedImage && (
-            <div style={{ width: '240px', height: '160px', borderRadius: '6px', overflow: 'hidden', flexShrink: 0, boxShadow: '0 4px 16px rgba(74,53,254,0.12)', marginBottom: '20px' }}>
+            <div style={{ width: '220px', height: '148px', borderRadius: '6px', overflow: 'hidden', flexShrink: 0, boxShadow: '0 4px 20px rgba(74,53,254,0.14)', marginBottom: '18px' }}>
               <img src={formData.uploadedImage} alt="Uploaded" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
             </div>
           )}
-          <div style={{
-            background: 'rgba(74,53,254,0.04)',
-            border: `1px solid ${BRAND.primary}20`,
-            borderLeft: `3px solid ${template.accentColor}`,
-            borderRadius: '8px',
-            padding: '22px 26px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '14px',
-            maxWidth: '440px',
-          }}>
-            {[
-              { icon: '📅', label: 'Date',  value: formData.eventDate ? formatDate(formData.eventDate) : '' },
-              { icon: '🕐', label: 'Time',  value: formData.eventTime },
-              { icon: '📍', label: 'Venue', value: formData.venue },
-              { icon: '📧', label: 'RSVP',  value: formData.rsvp },
-            ].filter(item => item.value).map((item, i) => (
-              <div key={i} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                <span style={{ fontSize: '15px', lineHeight: '1.5' }}>{item.icon}</span>
-                <div>
-                  <p style={{ color: BRAND.primary, fontSize: '9px', letterSpacing: '1.5px', textTransform: 'uppercase', margin: '0 0 2px 0', fontWeight: '700' }}>{item.label}</p>
-                  <p style={{ color: BRAND.textPrimary, fontSize: '14px', fontWeight: '500', margin: 0 }}>{item.value}</p>
+
+          {/* Detail cards row — icon + label pairs */}
+          {[
+            { icon: '📅', label: 'Date',  value: formData.eventDate ? formatDate(formData.eventDate) : '' },
+            { icon: '🕐', label: 'Time',  value: formData.eventTime },
+            { icon: '📍', label: 'Venue', value: formData.venue },
+            { icon: '📧', label: 'RSVP',  value: formData.rsvp },
+          ].filter(item => item.value).length > 0 && (
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: '10px',
+              maxWidth: '460px',
+            }}>
+              {[
+                { icon: '📅', label: 'Date',  value: formData.eventDate ? formatDate(formData.eventDate) : '' },
+                { icon: '🕐', label: 'Time',  value: formData.eventTime },
+                { icon: '📍', label: 'Venue', value: formData.venue },
+                { icon: '📧', label: 'RSVP',  value: formData.rsvp },
+              ].filter(item => item.value).map((item, i) => (
+                <div key={i} style={{
+                  background: '#F4F1FF',
+                  borderRadius: '8px',
+                  padding: '12px 14px',
+                  borderLeft: `3px solid ${BRAND.primary}`,
+                  display: 'flex', gap: '10px', alignItems: 'flex-start',
+                }}>
+                  <span style={{ fontSize: '14px', lineHeight: '1.4', flexShrink: 0 }}>{item.icon}</span>
+                  <div>
+                    <p style={{ color: BRAND.primary, fontSize: '8px', letterSpacing: '1.5px', textTransform: 'uppercase', margin: '0 0 3px 0', fontWeight: '700', fontFamily: FONT_SANS }}>{item.label}</p>
+                    <p style={{ color: BRAND.textPrimary, fontSize: '12.5px', fontWeight: '600', margin: 0, fontFamily: FONT_SANS, lineHeight: '1.4' }}>{item.value}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Purple footer */}
+      {/* Purple footer with thin accent line */}
       <div style={{
         background: BRAND.primary,
         width: '100%',
-        height: `${LAYOUT.footerH}px`,
+        padding: '11px 38px',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'space-between',
         flexShrink: 0,
         zIndex: 2,
+        boxSizing: 'border-box',
       }}>
-        <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '10px', letterSpacing: '2.5px', textTransform: 'uppercase', margin: 0, fontWeight: '500' }}>
+        <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '9.5px', letterSpacing: '2.5px', textTransform: 'uppercase', margin: 0, fontWeight: '600', fontFamily: FONT_SANS }}>
           {footerText}
         </p>
+        <Cars24LogoWhite />
       </div>
     </div>
   );
