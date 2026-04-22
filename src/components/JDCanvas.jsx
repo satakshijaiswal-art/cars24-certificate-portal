@@ -2,7 +2,7 @@ import { forwardRef } from 'react';
 
 // ─── Cars24 brand tokens ──────────────────────────────────────────────────────
 const B = {
-  primary:       '#4A35FE',
+  primary:       '#4736FE',
   primaryLight:  '#6B57FF',
   primaryLighter:'#8B7BFF',
   primaryPale:   '#E8E4FF',
@@ -12,9 +12,9 @@ const B = {
   offWhite:      '#FAFAFF',
   textPrimary:   '#1A1A1A',
   textSecondary: '#4A4A4A',
-  headerGrad:    'linear-gradient(135deg, #4A35FE 0%, #6B57FF 100%)',
-  heroGrad:      'linear-gradient(140deg, #2E1FCC 0%, #4A35FE 55%, #6B57FF 100%)',
-  sidebarGrad:   'linear-gradient(180deg, #2E1FCC 0%, #4A35FE 100%)',
+  headerGrad:    'linear-gradient(135deg, #4736FE 0%, #6B57FF 100%)',
+  heroGrad:      'linear-gradient(140deg, #2E1FCC 0%, #4736FE 55%, #6B57FF 100%)',
+  sidebarGrad:   'linear-gradient(180deg, #2E1FCC 0%, #4736FE 100%)',
 };
 
 const FONT_BODY    = "'Inter', 'Segoe UI', system-ui, sans-serif";
@@ -189,7 +189,7 @@ const ApplyButton = ({ link }) => {
       background: `linear-gradient(135deg, ${B.primary}, ${B.primaryLight})`,
       borderRadius: '24px',
       padding: '9px 22px',
-      boxShadow: '0 4px 16px rgba(74,53,254,0.3)',
+      boxShadow: '0 4px 16px rgba(71,54,254,0.3)',
     }}>
       <span style={{
         color: '#FFFFFF',

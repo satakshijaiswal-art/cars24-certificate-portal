@@ -7,7 +7,7 @@ import { jdTemplates, defaultJDForm } from './jdTemplates';
 
 // ─── Brand tokens ──────────────────────────────────────────────────────────────
 const B = {
-  primary: '#4A35FE',
+  primary: '#4736FE',
   primaryLight: '#6B57FF',
   primaryPale: '#E8E4FF',
 };
@@ -69,7 +69,7 @@ function JDTemplateThumbnail({ template, selected, onClick }) {
         flexShrink: 0,
       }}
       onMouseOver={(e) => {
-        if (!selected) e.currentTarget.style.border = `2px solid rgba(74,53,254,0.5)`;
+        if (!selected) e.currentTarget.style.border = `2px solid rgba(71,54,254,0.5)`;
       }}
       onMouseOut={(e) => {
         if (!selected) e.currentTarget.style.border = '2px solid rgba(255,255,255,0.08)';
@@ -78,7 +78,7 @@ function JDTemplateThumbnail({ template, selected, onClick }) {
       <div style={{
         width: '100%',
         height: '90px',
-        background: 'linear-gradient(135deg, #4A35FE 0%, #6B57FF 100%)',
+        background: 'linear-gradient(135deg, #4736FE 0%, #6B57FF 100%)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -263,7 +263,7 @@ export default function JDCreator({ onBack }) {
               alignItems: 'center',
               gap: '7px',
               fontFamily: "'Inter', sans-serif",
-              boxShadow: '0 4px 14px rgba(74,53,254,0.3)',
+              boxShadow: '0 4px 14px rgba(71,54,254,0.3)',
               opacity: isDownloading ? 0.6 : 1,
             }}
           >

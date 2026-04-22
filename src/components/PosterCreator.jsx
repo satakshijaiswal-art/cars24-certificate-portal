@@ -61,7 +61,7 @@ function TemplateThumbnail({ template, selected, onClick, mode }) {
       <div style={{
         width: '100%',
         height: '90px',
-        background: template.posterBg || template.gradient || '#4A35FE',
+        background: template.posterBg || template.gradient || '#4736FE',
         backgroundSize: 'cover',
         display: 'flex',
         alignItems: 'center',

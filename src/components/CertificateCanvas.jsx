@@ -1,9 +1,9 @@
 import { forwardRef } from 'react';
 
 const RaiseStandardsBadge = () => (
-  <img 
-    src="/raise-standards-badge.png" 
-    alt="Raise Standards Badge" 
+  <img
+    src={import.meta.env.BASE_URL + 'raise-standards-badge.png'}
+    alt="Raise Standards Badge"
     style={{ width: '156px', height: '156px' }}
   />
 );
@@ -25,12 +25,12 @@ const BarRaiserLayout = ({ template, formData }) => {
 
       {/* Stars and Line - Top */}
       <div style={{ marginBottom: '12px' }}>
-        <img src="/stars.png" alt="Stars" style={{ height: '24px', objectFit: 'contain' }} />
+        <img src={import.meta.env.BASE_URL + 'stars.png'} alt="Stars" style={{ height: '24px', objectFit: 'contain' }} />
       </div>
 
       {/* Bar Raiser Title */}
       <h1 style={{ 
-        color: '#4A35FE', 
+        color: '#4736FE', 
         fontSize: '42px', 
         fontWeight: '600',
         fontStyle: 'normal',
@@ -42,7 +42,7 @@ const BarRaiserLayout = ({ template, formData }) => {
 
       {/* Stars and Line - Bottom */}
       <div style={{ marginBottom: '32px' }}>
-        <img src="/stars.png" alt="Stars" style={{ height: '24px', objectFit: 'contain' }} />
+        <img src={import.meta.env.BASE_URL + 'stars.png'} alt="Stars" style={{ height: '24px', objectFit: 'contain' }} />
       </div>
 
       {/* Recipient Name */}
@@ -59,7 +59,7 @@ const BarRaiserLayout = ({ template, formData }) => {
       
       {/* Business Unit */}
       <p style={{ 
-        color: '#4A35FE', 
+        color: '#4736FE', 
         fontSize: '16px',
         fontFamily: 'Geist, sans-serif',
         lineHeight: '100%',
@@ -107,7 +107,7 @@ const BarRaiserLayout = ({ template, formData }) => {
           </div>
         )}
         <p style={{ 
-          color: '#4A35FE', 
+          color: '#4736FE', 
           fontSize: '12px',
           fontWeight: '500',
           letterSpacing: '2px',
@@ -291,8 +291,8 @@ const SvgTemplateLayout = ({ template, formData, globalSignature }) => {
       className="w-[595px] h-[842px] relative shadow-2xl"
       style={{ backgroundColor: '#ffffff' }}
     >
-      <img 
-        src={template.svgPath} 
+      <img
+        src={import.meta.env.BASE_URL + (template.svgFile || template.svgPath?.replace(/^\//, '') || '')}
         alt={template.name}
         style={{ width: '100%', height: '100%', objectFit: 'contain' }}
       />

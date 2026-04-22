@@ -2,14 +2,14 @@ import { forwardRef } from 'react';
 
 // ─── Cars24 brand tokens (used only for event announcements & footer) ──────────
 const BRAND = {
-  primary:      '#4A35FE',
+  primary:      '#4736FE',
   primaryLight: '#6B57FF',
   primaryDark:  '#2E1FCC',
   bg:           '#FFFFFF',
   textPrimary:  '#1A1A1A',
   textSecond:   '#4A4A4A',
-  headerGrad:   'linear-gradient(135deg, #4A35FE 0%, #6B57FF 100%)',
-  bodyWash:     'linear-gradient(180deg, rgba(74,53,254,0.03) 0%, rgba(255,255,255,1) 30%)',
+  headerGrad:   'linear-gradient(135deg, #4736FE 0%, #6B57FF 100%)',
+  bodyWash:     'linear-gradient(180deg, rgba(71,54,254,0.03) 0%, rgba(255,255,255,1) 30%)',
 };
 
 const FONT_SANS = "'Inter', 'Segoe UI', system-ui, sans-serif";
@@ -1197,7 +1197,7 @@ const LayeredCircles = ({ accentColor }) => (
 // ─── Purple-on-purple contrast block ─────────────────────────────────────────
 const PurpleBlock = ({ children, style = {} }) => (
   <div style={{
-    background: 'linear-gradient(135deg, #4A35FE 0%, #6B57FF 100%)',
+    background: 'linear-gradient(135deg, #4736FE 0%, #6B57FF 100%)',
     borderRadius: '6px',
     padding: '14px 22px',
     ...style,
@@ -1220,7 +1220,7 @@ const FestivalWishesCanvas = ({ template, formData }) => {
   const footerText    = formData.footerText?.trim()    || 'With warm wishes from Team Cars24';
 
   const fontStack   = template.fontStack   || FONT_SANS;
-  const accentColor = template.accentColor || '#4A35FE';
+  const accentColor = template.accentColor || '#4736FE';
   const accent2     = template.accentColor2 || accentColor;
   const posterBg    = template.posterBg    || '#FFFFFF';
 
@@ -1372,7 +1372,7 @@ const FestivalWishesCanvas = ({ template, formData }) => {
             lineHeight: '0.9',
             fontFamily: FONT_DISPLAY_POSTER,
             letterSpacing: '-4px',
-            background: `linear-gradient(135deg, #4A35FE, #8B7BFF)`,
+            background: `linear-gradient(135deg, #4736FE, #8B7BFF)`,
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text',
@@ -1408,7 +1408,7 @@ const FestivalWishesCanvas = ({ template, formData }) => {
             letterSpacing: '-1px',
             fontFamily: displayFont,
             maxWidth: layoutVariant === 'asymmetric-splash' ? '340px' : '490px',
-            background: `linear-gradient(135deg, #4A35FE 0%, #6B57FF 60%, #8B7BFF 100%)`,
+            background: `linear-gradient(135deg, #4736FE 0%, #6B57FF 60%, #8B7BFF 100%)`,
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text',
@@ -1508,7 +1508,7 @@ const FestivalWishesCanvas = ({ template, formData }) => {
         flexShrink: 0,
       }}>
         <p style={{
-          color: `rgba(74,53,254,0.55)`,
+          color: `rgba(71,54,254,0.55)`,
           fontSize: '9px',
           letterSpacing: '2px',
           textTransform: 'uppercase',
@@ -1713,7 +1713,7 @@ const EventAnnouncementCanvas = ({ template, formData }) => {
 
           {/* Uploaded image */}
           {formData.uploadedImage && (
-            <div style={{ width: '220px', height: '148px', borderRadius: '6px', overflow: 'hidden', flexShrink: 0, boxShadow: '0 4px 20px rgba(74,53,254,0.14)', marginBottom: '18px' }}>
+            <div style={{ width: '220px', height: '148px', borderRadius: '6px', overflow: 'hidden', flexShrink: 0, boxShadow: '0 4px 20px rgba(71,54,254,0.14)', marginBottom: '18px' }}>
               <img src={formData.uploadedImage} alt="Uploaded" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
             </div>
           )}

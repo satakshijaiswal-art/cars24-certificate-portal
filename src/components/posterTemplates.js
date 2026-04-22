@@ -14,7 +14,7 @@ export const FONT_STACKS = {
 };
 
 // ─── Cars24 brand palette ──────────────────────────────────────────────────────
-// PRIMARY: #4A35FE  PRIMARY_LIGHT: #6B57FF  PRIMARY_LIGHTER: #8B7BFF
+// PRIMARY: #4736FE  PRIMARY_LIGHT: #6B57FF  PRIMARY_LIGHTER: #8B7BFF
 // PRIMARY_PALE: #E8E4FF  PRIMARY_DARK: #2E1FCC
 // Backgrounds: white / off-white / very pale purple tint
 // Festival accents are used ONLY inside motif SVGs (30% of motif, not backgrounds)
@@ -28,9 +28,9 @@ export const festivalWishTemplates = [
     // White/pale-purple background — Cars24 brand
     posterBg: 'linear-gradient(160deg, #FAFAFF 0%, #F0EEFF 50%, #FAFAFF 100%)',
     headerStyle: 'none',
-    accentColor: '#4A35FE',       // Cars24 purple — diya base, borders
+    accentColor: '#4736FE',       // Cars24 purple — diya base, borders
     accentColor2: '#D4A017',      // Gold — festival accent (diya flame only)
-    textColor: '#4A35FE',
+    textColor: '#4736FE',
     bodyTextColor: '#4A4A4A',
     fontStack: "'Playfair Display', Georgia, serif",
     headlineFontSize: '52px',
@@ -47,9 +47,9 @@ export const festivalWishTemplates = [
     festival: 'Holi',
     posterBg: 'linear-gradient(145deg, #FAFAFF 0%, #F4F0FF 60%, #FAFAFF 100%)',
     headerStyle: 'none',
-    accentColor: '#4A35FE',       // Cars24 purple — dominant splash colour
+    accentColor: '#4736FE',       // Cars24 purple — dominant splash colour
     accentColor2: '#E91E8C',      // Magenta — festival accent (30% of splashes)
-    textColor: '#4A35FE',
+    textColor: '#4736FE',
     bodyTextColor: '#4A4A4A',
     fontStack: "'Fraunces', Georgia, serif",
     headlineFontSize: '58px',
@@ -66,9 +66,9 @@ export const festivalWishTemplates = [
     festival: 'Eid-ul-Fitr',
     posterBg: 'linear-gradient(160deg, #FAFAFF 0%, #EEE8FF 50%, #FAFAFF 100%)',
     headerStyle: 'none',
-    accentColor: '#4A35FE',       // Cars24 purple — crescent, borders
+    accentColor: '#4736FE',       // Cars24 purple — crescent, borders
     accentColor2: '#C9A23C',      // Gold star — festival accent
-    textColor: '#4A35FE',
+    textColor: '#4736FE',
     bodyTextColor: '#4A4A4A',
     fontStack: "'Playfair Display', Georgia, serif",
     headlineFontSize: '48px',
@@ -85,9 +85,9 @@ export const festivalWishTemplates = [
     festival: 'Eid-al-Adha',
     posterBg: 'linear-gradient(160deg, #FAFAFF 0%, #EEE8FF 50%, #FAFAFF 100%)',
     headerStyle: 'none',
-    accentColor: '#4A35FE',
+    accentColor: '#4736FE',
     accentColor2: '#C9A23C',
-    textColor: '#4A35FE',
+    textColor: '#4736FE',
     bodyTextColor: '#4A4A4A',
     fontStack: "'Playfair Display', Georgia, serif",
     headlineFontSize: '42px',
@@ -104,9 +104,9 @@ export const festivalWishTemplates = [
     festival: 'Christmas',
     posterBg: 'linear-gradient(170deg, #FAFAFF 0%, #F2EEFF 50%, #FAFAFF 100%)',
     headerStyle: 'none',
-    accentColor: '#4A35FE',       // Cars24 purple — most snowflakes, pine
+    accentColor: '#4736FE',       // Cars24 purple — most snowflakes, pine
     accentColor2: '#C62828',      // Christmas red — berry accents only
-    textColor: '#4A35FE',
+    textColor: '#4736FE',
     bodyTextColor: '#4A4A4A',
     fontStack: "'Playfair Display', Georgia, serif",
     headlineFontSize: '50px',
@@ -123,9 +123,9 @@ export const festivalWishTemplates = [
     festival: 'New Year',
     posterBg: 'linear-gradient(145deg, #FAFAFF 0%, #EDE8FF 55%, #FAFAFF 100%)',
     headerStyle: 'none',
-    accentColor: '#4A35FE',       // Cars24 purple — fireworks, confetti
+    accentColor: '#4736FE',       // Cars24 purple — fireworks, confetti
     accentColor2: '#D4A017',      // Gold — champagne accent
-    textColor: '#4A35FE',
+    textColor: '#4736FE',
     bodyTextColor: '#4A4A4A',
     fontStack: "'Playfair Display', Georgia, serif",
     headlineFontSize: '58px',
@@ -142,9 +142,9 @@ export const festivalWishTemplates = [
     festival: 'Independence Day',
     posterBg: 'linear-gradient(160deg, #FAFAFF 0%, #EEE8FF 50%, #FAFAFF 100%)',
     headerStyle: 'none',
-    accentColor: '#4A35FE',       // Cars24 purple — Chakra, borders
+    accentColor: '#4736FE',       // Cars24 purple — Chakra, borders
     accentColor2: '#FF8F00',      // Saffron — tricolour accent only
-    textColor: '#4A35FE',
+    textColor: '#4736FE',
     bodyTextColor: '#4A4A4A',
     fontStack: "'Playfair Display', Georgia, serif",
     headlineFontSize: '40px',
@@ -161,9 +161,9 @@ export const festivalWishTemplates = [
     festival: 'Republic Day',
     posterBg: 'linear-gradient(160deg, #FAFAFF 0%, #EEE8FF 60%, #FAFAFF 100%)',
     headerStyle: 'none',
-    accentColor: '#4A35FE',
+    accentColor: '#4736FE',
     accentColor2: '#FF8F00',
-    textColor: '#4A35FE',
+    textColor: '#4736FE',
     bodyTextColor: '#4A4A4A',
     fontStack: "'Playfair Display', Georgia, serif",
     headlineFontSize: '38px',
@@ -180,9 +180,9 @@ export const festivalWishTemplates = [
     festival: 'Raksha Bandhan',
     posterBg: 'linear-gradient(160deg, #FAFAFF 0%, #F0EEFF 50%, #FAFAFF 100%)',
     headerStyle: 'none',
-    accentColor: '#4A35FE',       // Cars24 purple — rakhi, floral corners
+    accentColor: '#4736FE',       // Cars24 purple — rakhi, floral corners
     accentColor2: '#D4851A',      // Saffron thread — festival accent
-    textColor: '#4A35FE',
+    textColor: '#4736FE',
     bodyTextColor: '#4A4A4A',
     fontStack: "'Playfair Display', Georgia, serif",
     headlineFontSize: '44px',
@@ -199,9 +199,9 @@ export const festivalWishTemplates = [
     festival: 'Ganesh Chaturthi',
     posterBg: 'linear-gradient(160deg, #FAFAFF 0%, #EEE8FF 50%, #FAFAFF 100%)',
     headerStyle: 'none',
-    accentColor: '#4A35FE',       // Cars24 purple — Om, border, marigolds
+    accentColor: '#4736FE',       // Cars24 purple — Om, border, marigolds
     accentColor2: '#D4851A',      // Saffron — marigold accent
-    textColor: '#4A35FE',
+    textColor: '#4736FE',
     bodyTextColor: '#4A4A4A',
     fontStack: "'Fraunces', Georgia, serif",
     headlineFontSize: '40px',
@@ -218,9 +218,9 @@ export const festivalWishTemplates = [
     festival: 'Dussehra',
     posterBg: 'linear-gradient(160deg, #FAFAFF 0%, #EEE8FF 50%, #FAFAFF 100%)',
     headerStyle: 'none',
-    accentColor: '#4A35FE',
+    accentColor: '#4736FE',
     accentColor2: '#D4851A',      // Saffron flame accent
-    textColor: '#4A35FE',
+    textColor: '#4736FE',
     bodyTextColor: '#4A4A4A',
     fontStack: "'Fraunces', Georgia, serif",
     headlineFontSize: '52px',
@@ -237,9 +237,9 @@ export const festivalWishTemplates = [
     festival: 'Navratri',
     posterBg: 'linear-gradient(135deg, #F0EEFF 0%, #E8E4FF 50%, #F0EEFF 100%)',
     headerStyle: 'none',
-    accentColor: '#4A35FE',       // Cars24 purple — primary motif
+    accentColor: '#4736FE',       // Cars24 purple — primary motif
     accentColor2: '#E91E8C',      // Magenta — festival accent (dandiya pops)
-    textColor: '#4A35FE',
+    textColor: '#4736FE',
     bodyTextColor: '#4A4A4A',
     fontStack: "'Fraunces', Georgia, serif",
     headlineFontSize: '54px',
@@ -256,9 +256,9 @@ export const festivalWishTemplates = [
     festival: 'Onam',
     posterBg: 'linear-gradient(160deg, #FAFAFF 0%, #F0EEFF 50%, #FAFAFF 100%)',
     headerStyle: 'none',
-    accentColor: '#4A35FE',       // Cars24 purple — pookalam flowers, border
+    accentColor: '#4736FE',       // Cars24 purple — pookalam flowers, border
     accentColor2: '#D4851A',      // Warm gold — festival accent
-    textColor: '#4A35FE',
+    textColor: '#4736FE',
     bodyTextColor: '#4A4A4A',
     fontStack: "'Playfair Display', Georgia, serif",
     headlineFontSize: '54px',
@@ -275,9 +275,9 @@ export const festivalWishTemplates = [
     festival: 'Pongal',
     posterBg: 'linear-gradient(160deg, #FAFAFF 0%, #EEE8FF 50%, #FAFAFF 100%)',
     headerStyle: 'none',
-    accentColor: '#4A35FE',       // Cars24 purple — kolam, border
+    accentColor: '#4736FE',       // Cars24 purple — kolam, border
     accentColor2: '#D4851A',      // Amber — pongal pot / harvest accent
-    textColor: '#4A35FE',
+    textColor: '#4736FE',
     bodyTextColor: '#4A4A4A',
     fontStack: "'Fraunces', Georgia, serif",
     headlineFontSize: '54px',
@@ -294,9 +294,9 @@ export const festivalWishTemplates = [
     festival: 'Baisakhi',
     posterBg: 'linear-gradient(160deg, #FAFAFF 0%, #EEE8FF 50%, #FAFAFF 100%)',
     headerStyle: 'none',
-    accentColor: '#4A35FE',       // Cars24 purple — khanda, border
+    accentColor: '#4736FE',       // Cars24 purple — khanda, border
     accentColor2: '#D4A017',      // Wheat gold — harvest accent
-    textColor: '#4A35FE',
+    textColor: '#4736FE',
     bodyTextColor: '#4A4A4A',
     fontStack: "'Fraunces', Georgia, serif",
     headlineFontSize: '54px',
@@ -313,9 +313,9 @@ export const festivalWishTemplates = [
     festival: 'Lohri',
     posterBg: 'linear-gradient(160deg, #F4F0FF 0%, #E8E4FF 50%, #F4F0FF 100%)',
     headerStyle: 'none',
-    accentColor: '#4A35FE',       // Cars24 purple — border, dots
+    accentColor: '#4736FE',       // Cars24 purple — border, dots
     accentColor2: '#FF6D00',      // Fire orange — flame accent only
-    textColor: '#4A35FE',
+    textColor: '#4736FE',
     bodyTextColor: '#4A4A4A',
     fontStack: "'Fraunces', Georgia, serif",
     headlineFontSize: '56px',
@@ -332,9 +332,9 @@ export const festivalWishTemplates = [
     festival: 'Gurpurab',
     posterBg: 'linear-gradient(160deg, #FAFAFF 0%, #EEE8FF 50%, #FAFAFF 100%)',
     headerStyle: 'none',
-    accentColor: '#4A35FE',       // Cars24 purple — Khanda, lanterns, border
+    accentColor: '#4736FE',       // Cars24 purple — Khanda, lanterns, border
     accentColor2: '#D4A017',      // Gold — festival accent
-    textColor: '#4A35FE',
+    textColor: '#4736FE',
     bodyTextColor: '#4A4A4A',
     fontStack: "'Playfair Display', Georgia, serif",
     headlineFontSize: '46px',
@@ -351,9 +351,9 @@ export const festivalWishTemplates = [
     festival: 'Good Friday',
     posterBg: 'linear-gradient(160deg, #FAFAFF 0%, #EEE8FF 60%, #FAFAFF 100%)',
     headerStyle: 'none',
-    accentColor: '#4A35FE',       // Cars24 purple — cross, floral
+    accentColor: '#4736FE',       // Cars24 purple — cross, floral
     accentColor2: '#8B7BFF',      // Purple lighter — serene variation
-    textColor: '#4A35FE',
+    textColor: '#4736FE',
     bodyTextColor: '#4A4A4A',
     fontStack: "'Playfair Display', Georgia, serif",
     headlineFontSize: '46px',
@@ -370,9 +370,9 @@ export const festivalWishTemplates = [
     festival: 'Buddha Purnima',
     posterBg: 'linear-gradient(160deg, #FAFAFF 0%, #F0EEFF 50%, #FAFAFF 100%)',
     headerStyle: 'none',
-    accentColor: '#4A35FE',       // Cars24 purple — lotus, dharma wheel
+    accentColor: '#4736FE',       // Cars24 purple — lotus, dharma wheel
     accentColor2: '#D4A017',      // Serene gold — inner lotus accent
-    textColor: '#4A35FE',
+    textColor: '#4736FE',
     bodyTextColor: '#4A4A4A',
     fontStack: "'Playfair Display', Georgia, serif",
     headlineFontSize: '44px',
@@ -389,9 +389,9 @@ export const festivalWishTemplates = [
     festival: 'Mahavir Jayanti',
     posterBg: 'linear-gradient(160deg, #FAFAFF 0%, #EEE8FF 50%, #FAFAFF 100%)',
     headerStyle: 'none',
-    accentColor: '#4A35FE',       // Cars24 purple — Jain hand, border
+    accentColor: '#4736FE',       // Cars24 purple — Jain hand, border
     accentColor2: '#D4A017',      // Gold — serene accent
-    textColor: '#4A35FE',
+    textColor: '#4736FE',
     bodyTextColor: '#4A4A4A',
     fontStack: "'Playfair Display', Georgia, serif",
     headlineFontSize: '40px',
@@ -411,7 +411,7 @@ export const eventAnnouncementTemplates = [
     name: 'Festival Celebration',
     posterBg: null, // uses BRAND header strip
     headerStyle: 'brand',
-    gradient: 'linear-gradient(135deg, #4A35FE 0%, #6B57FF 100%)',
+    gradient: 'linear-gradient(135deg, #4736FE 0%, #6B57FF 100%)',
     bgColor: '#FFFFFF',
     accentColor: '#FF69B4',
     textColor: '#1A1A1A',
@@ -425,9 +425,9 @@ export const eventAnnouncementTemplates = [
     name: 'Town Hall',
     posterBg: null,
     headerStyle: 'brand',
-    gradient: 'linear-gradient(135deg, #4A35FE 0%, #6B57FF 100%)',
+    gradient: 'linear-gradient(135deg, #4736FE 0%, #6B57FF 100%)',
     bgColor: '#FFFFFF',
-    accentColor: '#4A35FE',
+    accentColor: '#4736FE',
     textColor: '#1A1A1A',
     secondaryColor: '#6B57FF',
     defaultTitle: 'All Hands Town Hall',
@@ -439,7 +439,7 @@ export const eventAnnouncementTemplates = [
     name: 'R&R Ceremony',
     posterBg: null,
     headerStyle: 'brand',
-    gradient: 'linear-gradient(135deg, #4A35FE 0%, #6B57FF 100%)',
+    gradient: 'linear-gradient(135deg, #4736FE 0%, #6B57FF 100%)',
     bgColor: '#FFFFFF',
     accentColor: '#FFD700',
     textColor: '#1A1A1A',
@@ -453,7 +453,7 @@ export const eventAnnouncementTemplates = [
     name: 'Hackathon',
     posterBg: null,
     headerStyle: 'brand',
-    gradient: 'linear-gradient(135deg, #4A35FE 0%, #6B57FF 100%)',
+    gradient: 'linear-gradient(135deg, #4736FE 0%, #6B57FF 100%)',
     bgColor: '#FFFFFF',
     accentColor: '#00C9A7',
     textColor: '#1A1A1A',
@@ -467,7 +467,7 @@ export const eventAnnouncementTemplates = [
     name: 'Wellness Week',
     posterBg: null,
     headerStyle: 'brand',
-    gradient: 'linear-gradient(135deg, #4A35FE 0%, #6B57FF 100%)',
+    gradient: 'linear-gradient(135deg, #4736FE 0%, #6B57FF 100%)',
     bgColor: '#FFFFFF',
     accentColor: '#6FCF97',
     textColor: '#1A1A1A',
@@ -481,7 +481,7 @@ export const eventAnnouncementTemplates = [
     name: 'Offsite',
     posterBg: null,
     headerStyle: 'brand',
-    gradient: 'linear-gradient(135deg, #4A35FE 0%, #6B57FF 100%)',
+    gradient: 'linear-gradient(135deg, #4736FE 0%, #6B57FF 100%)',
     bgColor: '#FFFFFF',
     accentColor: '#FF8008',
     textColor: '#1A1A1A',
@@ -495,7 +495,7 @@ export const eventAnnouncementTemplates = [
     name: 'Product Launch',
     posterBg: null,
     headerStyle: 'brand',
-    gradient: 'linear-gradient(135deg, #4A35FE 0%, #6B57FF 100%)',
+    gradient: 'linear-gradient(135deg, #4736FE 0%, #6B57FF 100%)',
     bgColor: '#FFFFFF',
     accentColor: '#00BFFF',
     textColor: '#1A1A1A',
@@ -509,7 +509,7 @@ export const eventAnnouncementTemplates = [
     name: 'Work Anniversary',
     posterBg: null,
     headerStyle: 'brand',
-    gradient: 'linear-gradient(135deg, #4A35FE 0%, #6B57FF 100%)',
+    gradient: 'linear-gradient(135deg, #4736FE 0%, #6B57FF 100%)',
     bgColor: '#FFFFFF',
     accentColor: '#FFD700',
     textColor: '#1A1A1A',

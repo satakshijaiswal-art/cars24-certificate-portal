@@ -2,7 +2,7 @@ export const pptSlideTemplates = [
   {
     id: 'bar-raiser',
     name: 'Bar Raiser',
-    bgColor: '#4A35FE',
+    bgColor: '#4736FE',
     titleColor: '#FFFFFF',
     textColor: '#FFFFFF',
     accentColor: '#00FFAA',

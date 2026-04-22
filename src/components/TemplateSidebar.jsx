@@ -68,8 +68,8 @@ const SvgTemplatePreview = ({ template }) => (
     className="p-2 flex items-center justify-center"
     style={{ backgroundColor: '#ffffff', aspectRatio: '595/842' }}
   >
-    <img 
-      src={template.svgPath} 
+    <img
+      src={import.meta.env.BASE_URL + (template.svgFile || template.svgPath?.replace(/^\//, '') || '')}
       alt={template.name}
       style={{ width: '100%', height: '100%', objectFit: 'contain' }}
     />

@@ -598,7 +598,7 @@ function PPTCreator({ onBack }) {
             onClick={() => excelInputRef.current?.click()}
             className="hover:opacity-90 transition-all"
             style={{
-              background: '#4A35FE',
+              background: '#4736FE',
               border: 'none',
               padding: '10px 20px',
               borderRadius: '10px',
@@ -871,7 +871,7 @@ function PPTCreator({ onBack }) {
                   fontVariantNumeric: 'tabular-nums'
                 }}>
                   <span style={{
-                    color: '#4A35FE',
+                    color: '#4736FE',
                     fontWeight: 700,
                     fontSize: '14px'
                   }}>

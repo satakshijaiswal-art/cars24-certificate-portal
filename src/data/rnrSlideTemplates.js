@@ -9,13 +9,13 @@ export const rnrSlideConfig = {
   // Background configuration
   background: {
     svgPath: '/assets/rnr-bg.svg',
-    fallbackColor: '#4A35FE',
+    fallbackColor: '#4736FE',
     gradientColors: ['#5168FF', '#4837FF', '#2B2199']
   },
   
   // Brand colors
   colors: {
-    primary: '#4A35FE',
+    primary: '#4736FE',
     secondary: '#63FFB1', // Green accent (star)
     text: '#FFFFFF',
     textMuted: '#B8B8B8',

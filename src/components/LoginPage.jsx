@@ -190,7 +190,7 @@ export default function LoginPage({ onLogin }) {
           style={{
             width: '100%',
             padding: '14px 24px',
-            background: '#4A35FE',
+            background: '#4736FE',
             border: 'none',
             borderRadius: '14px',
             color: '#FFFFFF',
@@ -207,7 +207,7 @@ export default function LoginPage({ onLogin }) {
             e.currentTarget.style.background = '#3a2bd4';
           }}
           onMouseOut={(e) => {
-            e.currentTarget.style.background = '#4A35FE';
+            e.currentTarget.style.background = '#4736FE';
           }}
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
