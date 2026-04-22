@@ -587,47 +587,47 @@ const DussehraMotif = ({ accentColor, accentColor2 }) => (
   </svg>
 );
 
-// NAVRATRI — vivid multi-colour, dancing silhouettes, dandiya sticks
+// NAVRATRI — pale purple BG, Cars24 purple garba silhouettes, magenta dandiya accent
 const NavratriMotif = ({ accentColor, accentColor2 }) => (
   <svg style={{ position:'absolute', inset:0, width:'100%', height:'100%', pointerEvents:'none', overflow:'hidden' }}
     viewBox="0 0 595 842" preserveAspectRatio="xMidYMid slice">
-    {/* Dancing garba circle silhouettes */}
+    {/* Dancing garba circle silhouettes — Cars24 purple */}
     {Array.from({length:8}).map((_,i) => {
       const a = (i/8)*Math.PI*2;
       const cx = 297 + Math.cos(a)*120;
       const cy = 430 + Math.sin(a)*80;
       return (
-        <g key={`garba${i}`} transform={`translate(${cx},${cy})`} opacity="0.18">
-          <ellipse cx="0" cy="12" rx="10" ry="18" fill="#FFFFFF" />
-          <circle cx="0" cy="-14" r="7" fill="#FFFFFF" />
-          <line x1="-12" y1="5" x2="-22" y2="-5" stroke="#FFFFFF" strokeWidth="2" />
-          <line x1="12" y1="5" x2="22" y2="-5" stroke="#FFFFFF" strokeWidth="2" />
-          <line x1="-5" y1="30" x2="-10" y2="50" stroke="#FFFFFF" strokeWidth="2" />
-          <line x1="5" y1="30" x2="10" y2="50" stroke="#FFFFFF" strokeWidth="2" />
+        <g key={`garba${i}`} transform={`translate(${cx},${cy})`} opacity="0.22">
+          <ellipse cx="0" cy="12" rx="10" ry="18" fill={accentColor} />
+          <circle cx="0" cy="-14" r="7" fill={accentColor} />
+          <line x1="-12" y1="5" x2="-22" y2="-5" stroke={accentColor} strokeWidth="2" />
+          <line x1="12" y1="5" x2="22" y2="-5" stroke={accentColor} strokeWidth="2" />
+          <line x1="-5" y1="30" x2="-10" y2="50" stroke={accentColor} strokeWidth="2" />
+          <line x1="5" y1="30" x2="10" y2="50" stroke={accentColor} strokeWidth="2" />
         </g>
       );
     })}
-    {/* Dandiya sticks — corners */}
+    {/* Dandiya sticks — corners: Cars24 purple body, magenta tip accent */}
     {[[60,200,-30],[535,200,30],[60,760,20],[535,760,-20]].map(([x,y,rot],i) => (
       <g key={`dan${i}`} transform={`translate(${x},${y}) rotate(${rot})`} opacity="0.28">
-        <rect x="-4" y="-55" width="8" height="110" rx="4" fill={['#CC0066','#FF6B00','#FFD700','#CC0066'][i%4]} />
-        <circle cx="0" cy="-58" r="8" fill={['#FFD700','#CC0066','#FF6B00','#FFD700'][i%4]} />
-        <circle cx="0" cy="58" r="8" fill={['#FFD700','#CC0066','#FF6B00','#FFD700'][i%4]} />
+        <rect x="-4" y="-55" width="8" height="110" rx="4" fill={i%2===0?accentColor:'#6B57FF'} />
+        <circle cx="0" cy="-58" r="8" fill={i%2===0?accentColor2:accentColor} />
+        <circle cx="0" cy="58" r="8" fill={i%2===0?accentColor2:accentColor} />
       </g>
     ))}
-    {/* Colourful border dots */}
+    {/* Border dots — Cars24 purple with magenta pops */}
     {Array.from({length:22}).map((_,i) => (
       <circle key={`nbd${i}`} cx={25+i*25} cy={178} r="4"
-        fill={['#CC0066','#FF6B00','#FFD700','#00CED1','#7B68EE'][i%5]} opacity="0.5" />
+        fill={i%4===3?accentColor2:accentColor} opacity="0.35" />
     ))}
     {Array.from({length:22}).map((_,i) => (
       <circle key={`nbd2${i}`} cx={25+i*25} cy={824} r="4"
-        fill={['#CC0066','#FF6B00','#FFD700','#00CED1','#7B68EE'][i%5]} opacity="0.5" />
+        fill={i%4===3?accentColor2:accentColor} opacity="0.35" />
     ))}
-    {/* Central mandala rings */}
+    {/* Central mandala rings — Cars24 purple */}
     {[30,50,70,90,110].map((r,i) => (
       <circle key={`nm${i}`} cx="297" cy="430" r={r} fill="none"
-        stroke={['#FFFFFF','#FFD700','#FF6B00','#CC0066','#FFFFFF'][i]}
+        stroke={i===4?accentColor2:accentColor}
         strokeWidth="1" opacity="0.12" />
     ))}
   </svg>
@@ -780,41 +780,41 @@ const LohriMotif = ({ accentColor, accentColor2 }) => (
     viewBox="0 0 595 842" preserveAspectRatio="xMidYMid slice">
     {/* Large bonfire centre */}
     <g transform="translate(297, 680)" opacity="0.55">
-      {/* Logs */}
-      <rect x="-50" y="10" width="100" height="14" rx="7" fill="#5C2800" transform="rotate(-15)" />
-      <rect x="-50" y="10" width="100" height="14" rx="7" fill="#5C2800" transform="rotate(15)" />
-      {/* Outer flame */}
+      {/* Logs — Cars24 purple */}
+      <rect x="-50" y="10" width="100" height="14" rx="7" fill={accentColor} opacity="0.5" transform="rotate(-15)" />
+      <rect x="-50" y="10" width="100" height="14" rx="7" fill="#6B57FF" opacity="0.4" transform="rotate(15)" />
+      {/* Outer flame — fire orange festival accent */}
       <path d="M0,-90 Q35,-60 30,-20 Q45,-50 40,10 Q20,-5 0,20 Q-20,-5 -40,10 Q-45,-50 -30,-20 Q-35,-60 0,-90Z"
-        fill="#FF4500" />
+        fill={accentColor2} />
       {/* Mid flame */}
-      <path d="M0,-65 Q22,-40 20,-5 Q0,10 -20,-5 Q-22,-40 0,-65Z" fill="#FF8C00" />
-      {/* Inner flame */}
-      <path d="M0,-40 Q12,-20 10,5 Q0,15 -10,5 Q-12,-20 0,-40Z" fill="#FFD700" />
+      <path d="M0,-65 Q22,-40 20,-5 Q0,10 -20,-5 Q-22,-40 0,-65Z" fill="#FFAB40" />
+      {/* Inner flame — gold accent */}
+      <path d="M0,-40 Q12,-20 10,5 Q0,15 -10,5 Q-12,-20 0,-40Z" fill="#FFD54F" />
       {/* Glow */}
       <radialGradient id="lohriGlow" cx="50%" cy="60%" r="50%">
-        <stop offset="0%" stopColor="#FF6B00" stopOpacity="0.4" />
-        <stop offset="100%" stopColor="#FF6B00" stopOpacity="0" />
+        <stop offset="0%" stopColor={accentColor2} stopOpacity="0.35" />
+        <stop offset="100%" stopColor={accentColor2} stopOpacity="0" />
       </radialGradient>
       <ellipse cx="0" cy="0" rx="80" ry="60" fill="url(#lohriGlow)" />
     </g>
-    {/* Sparks / embers */}
+    {/* Sparks / embers — orange/gold accent */}
     {[[260,580],[310,560],[280,540],[320,590],[250,570],[340,555],
       [230,610],[360,605],[270,520],[300,510]].map(([x,y],i) => (
       <circle key={`sp${i}`} cx={x} cy={y} r={2+(i%3)}
-        fill={i%2===0?'#FF4500':'#FFD700'} opacity={0.5+i*0.03} />
+        fill={i%2===0?accentColor2:'#FFD54F'} opacity={0.5+i*0.03} />
     ))}
     {/* Glow ring around fire */}
     <radialGradient id="lohriAmbient" cx="50%" cy="81%" r="30%">
-      <stop offset="0%" stopColor="#FF6B00" stopOpacity="0.22" />
-      <stop offset="100%" stopColor="#FF6B00" stopOpacity="0" />
+      <stop offset="0%" stopColor={accentColor2} stopOpacity="0.18" />
+      <stop offset="100%" stopColor={accentColor2} stopOpacity="0" />
     </radialGradient>
     <ellipse cx="297" cy="680" rx="180" ry="120" fill="url(#lohriAmbient)" />
-    {/* Sugarcane stalks sides */}
+    {/* Sugarcane stalks — Cars24 purple */}
     {[[55,680,1],[540,680,-1]].map(([x,y,flip],i) => (
-      <g key={`lsc${i}`} transform={`translate(${x},${y}) scale(${flip},1)`} opacity="0.25">
-        <rect x="-3" y="-200" width="6" height="200" rx="3" fill="#228B22" />
+      <g key={`lsc${i}`} transform={`translate(${x},${y}) scale(${flip},1)`} opacity="0.22">
+        <rect x="-3" y="-200" width="6" height="200" rx="3" fill={accentColor} />
         {[-160,-120,-80,-40].map(cy => (
-          <ellipse key={cy} cx="12" cy={cy} rx="14" ry="5" fill="#228B22" transform="rotate(-30)" />
+          <ellipse key={cy} cx="12" cy={cy} rx="14" ry="5" fill="#6B57FF" transform="rotate(-30)" />
         ))}
       </g>
     ))}
