@@ -1,0 +1,25 @@
+Cars24 Certificate Platform — Setup on a new system
+=====================================================
+
+Requirements: Node.js 18+ and npm.
+
+1. Unzip this file.
+2. Open Terminal and cd into the unzipped folder:
+     cd certificate-platform
+3. Install dependencies:
+     npm install
+4. Run locally:
+     npm run dev
+   Open the URL it prints (usually http://localhost:5173).
+
+To build for production:
+     npm run build
+Output goes to dist/.
+
+Live deploy (current): https://cars24-certificate-platform.netlify.app
+Netlify site ID: 154418a7-48da-4e94-83bf-77efc7c10f1a
+
+For background-removal feature, set these env vars in Netlify (or in a local .env):
+     REMOVE_BG_API_KEY
+     PHOTOROOM_API_KEY
+     CLIPDROP_API_KEY

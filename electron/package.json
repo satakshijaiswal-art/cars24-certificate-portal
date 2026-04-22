@@ -1,0 +1,71 @@
+{
+  "name": "cars24-certificate-portal",
+  "version": "1.0.0",
+  "description": "Cars24 Certificate Portal — desktop app",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build:mac": "electron-builder --mac --x64",
+    "build:mac-arm": "electron-builder --mac --arm64",
+    "build:win": "electron-builder --win --x64",
+    "build:all": "electron-builder --mac --win --x64"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.cars24.certificate-portal",
+    "productName": "Cars24 Certificate Portal",
+    "copyright": "Copyright © 2024 Cars24",
+    "files": [
+      "main.js",
+      "preload.js",
+      "../dist/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "../dist",
+        "to": "dist",
+        "filter": ["**/*"]
+      }
+    ],
+    "directories": {
+      "output": "../electron-dist"
+    },
+    "mac": {
+      "category": "public.app-category.business",
+      "icon": "icons/icon.icns",
+      "target": [
+        { "target": "dmg", "arch": ["x64", "arm64"] }
+      ],
+      "darkModeSupport": true
+    },
+    "win": {
+      "icon": "icons/icon.ico",
+      "target": [
+        { "target": "nsis", "arch": ["x64"] }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Cars24 Certificate Portal"
+    },
+    "dmg": {
+      "title": "Cars24 Certificate Portal",
+      "background": null,
+      "window": {
+        "width": 540,
+        "height": 380
+      },
+      "contents": [
+        { "x": 140, "y": 200, "type": "file" },
+        { "x": 400, "y": 200, "type": "link", "path": "/Applications" }
+      ]
+    }
+  }
+}
