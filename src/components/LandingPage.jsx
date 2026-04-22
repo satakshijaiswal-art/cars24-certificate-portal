@@ -125,9 +125,9 @@ function LandingPage({ onSelectSection }) {
             textAlign: 'center'
           }}
           onMouseOver={(e) => {
-            e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.4)';
+            e.currentTarget.style.border = '1px solid #4736FE';
             e.currentTarget.style.transform = 'translateY(-8px)';
-            e.currentTarget.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.35)';
+            e.currentTarget.style.boxShadow = '0 20px 40px rgba(71, 54, 254, 0.3)';
           }}
           onMouseOut={(e) => {
             e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.06)';
@@ -140,13 +140,12 @@ function LandingPage({ onSelectSection }) {
               width: '80px',
               height: '80px',
               borderRadius: '20px',
-              background: 'linear-gradient(135deg, #3A3A3A 0%, #5A5A5A 100%)',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
+              background: 'linear-gradient(135deg, #4736FE 0%, #6B57FF 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               marginBottom: '24px',
-              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)'
+              boxShadow: '0 8px 24px rgba(71, 54, 254, 0.35)'
             }}
           >
             <Presentation size={40} color="#FFFFFF" />
