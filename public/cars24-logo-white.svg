@@ -1,0 +1,35 @@
+<svg width="220" height="60" viewBox="0 0 220 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- White rounded-square tile outline (for dark/purple backgrounds) -->
+  <rect x="2" y="2" width="56" height="56" rx="13" fill="#FFFFFF" fill-opacity="0.15" stroke="#FFFFFF" stroke-width="2"/>
+
+  <!--
+    Stylised "C" glyph — white donut with gap on the right side.
+    Same geometry as the dark variant: cx=30, cy=30, outer r=15, inner r=9, gap ±50° on right.
+  -->
+  <path
+    d="
+      M 39.64,18.51
+      A 15,15 0 1,0 39.64,41.49
+      L 35.79,36.89
+      A 9,9   0 1,1 35.79,23.11
+      Z
+    "
+    fill="#FFFFFF"
+  />
+
+  <!-- Accent dot in C opening -->
+  <circle cx="42" cy="30" r="2.5" fill="#FFFFFF"/>
+
+  <!-- "Cars24" wordmark in white -->
+  <text
+    x="70"
+    y="41"
+    font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif"
+    font-size="30"
+    font-weight="800"
+    fill="#FFFFFF"
+    letter-spacing="-1"
+  >Cars24</text>
+
+</svg>

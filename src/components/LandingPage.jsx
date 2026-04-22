@@ -24,7 +24,7 @@ function LandingPage({ onSelectSection }) {
           letterSpacing: '-0.5px'
         }}
       >
-        Welcome to <span style={{ color: '#4736FE' }}>Cars24</span> Creator Studio
+        Welcome to <span style={{ color: '#4A35FE' }}>Cars24</span> Creator Studio
       </h1>
       <p
         style={{
@@ -62,9 +62,9 @@ function LandingPage({ onSelectSection }) {
             textAlign: 'center'
           }}
           onMouseOver={(e) => {
-            e.currentTarget.style.border = '1px solid #4736FE';
+            e.currentTarget.style.border = '1px solid #4A35FE';
             e.currentTarget.style.transform = 'translateY(-8px)';
-            e.currentTarget.style.boxShadow = '0 20px 40px rgba(71, 54, 254, 0.3)';
+            e.currentTarget.style.boxShadow = '0 20px 40px rgba(74, 53, 254, 0.3)';
           }}
           onMouseOut={(e) => {
             e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.06)';
@@ -77,12 +77,12 @@ function LandingPage({ onSelectSection }) {
               width: '80px',
               height: '80px',
               borderRadius: '20px',
-              background: 'linear-gradient(135deg, #4736FE 0%, #8B5CF6 100%)',
+              background: 'linear-gradient(135deg, #4A35FE 0%, #8B5CF6 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               marginBottom: '24px',
-              boxShadow: '0 8px 24px rgba(71, 54, 254, 0.35)'
+              boxShadow: '0 8px 24px rgba(74, 53, 254, 0.35)'
             }}
           >
             <Award size={40} color="#FFFFFF" />

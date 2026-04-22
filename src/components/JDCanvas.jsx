@@ -24,31 +24,18 @@ const FONT_DISPLAY = "'Playfair Display', Georgia, serif";
 const W = 595;
 const H = 842;
 
-// ─── Logo — uses /cars24-logo.png from /public ────────────────────────────────
+// ─── Logo — uses SVG variants from /public ────────────────────────────────────
 const Logo = ({ height = 40, invert = false, style: extraStyle = {} }) => (
   <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, ...extraStyle }}>
     <img
-      src="/cars24-logo.png"
+      src={import.meta.env.BASE_URL + (invert ? 'cars24-logo-white.svg' : 'cars24-logo.svg')}
       alt="Cars24"
       style={{
         height: `${height}px`,
         objectFit: 'contain',
         display: 'block',
-        ...(invert ? { filter: 'brightness(0) invert(1)' } : {}),
-      }}
-      onError={(e) => {
-        e.target.style.display = 'none';
-        if (e.target.nextSibling) e.target.nextSibling.style.display = 'block';
       }}
     />
-    <span style={{
-      display: 'none',
-      color: invert ? '#FFFFFF' : B.primary,
-      fontSize: `${Math.round(height * 0.55)}px`,
-      fontWeight: '800',
-      fontFamily: FONT_BODY,
-      letterSpacing: '-0.5px',
-    }}>Cars24</span>
   </div>
 );
 

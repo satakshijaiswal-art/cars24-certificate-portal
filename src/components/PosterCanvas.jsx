@@ -30,22 +30,20 @@ const formatDate = (dateStr) => {
 
 // ─── Cars24 logo (dark version for light backgrounds) ─────────────────────────
 const Cars24LogoDark = () => (
-  <>
-    <img src="/cars24-logo.png" alt="Cars24"
-      style={{ height: '28px', objectFit: 'contain' }}
-      onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='block'; }} />
-    <span style={{ display: 'none', color: '#4A35FE', fontSize: '22px', fontWeight: '800', fontFamily: "'Inter', sans-serif", letterSpacing: '-0.5px' }}>Cars24</span>
-  </>
+  <img
+    src={import.meta.env.BASE_URL + 'cars24-logo.svg'}
+    alt="Cars24"
+    style={{ height: '32px', objectFit: 'contain' }}
+  />
 );
 
 // ─── Cars24 logo (white version for dark backgrounds) ────────────────────────
 const Cars24LogoWhite = () => (
-  <>
-    <img src="/cars24-logo.png" alt="Cars24"
-      style={{ height: '28px', objectFit: 'contain', filter: 'brightness(0) invert(1)' }}
-      onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='block'; }} />
-    <span style={{ display: 'none', color: '#FFFFFF', fontSize: '22px', fontWeight: '800', fontFamily: "'Inter', sans-serif", letterSpacing: '-0.5px' }}>Cars24</span>
-  </>
+  <img
+    src={import.meta.env.BASE_URL + 'cars24-logo-white.svg'}
+    alt="Cars24"
+    style={{ height: '32px', objectFit: 'contain' }}
+  />
 );
 
 // ─── Uploaded image block ─────────────────────────────────────────────────────

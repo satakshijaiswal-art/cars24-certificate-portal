@@ -16,10 +16,10 @@ const BarRaiserLayout = ({ template, formData }) => {
     >
       {/* Cars24 Logo */}
       <div style={{ marginBottom: '48px' }}>
-        <img 
-          src="/cars24-logo.png" 
-          alt="Cars24 Logo" 
-          style={{ height: '32px', width: '150.76px', objectFit: 'contain' }}
+        <img
+          src={import.meta.env.BASE_URL + 'cars24-logo.svg'}
+          alt="Cars24"
+          style={{ height: '32px', objectFit: 'contain' }}
         />
       </div>
 
@@ -30,7 +30,7 @@ const BarRaiserLayout = ({ template, formData }) => {
 
       {/* Bar Raiser Title */}
       <h1 style={{ 
-        color: '#4736fe', 
+        color: '#4A35FE', 
         fontSize: '42px', 
         fontWeight: '600',
         fontStyle: 'normal',
@@ -59,7 +59,7 @@ const BarRaiserLayout = ({ template, formData }) => {
       
       {/* Business Unit */}
       <p style={{ 
-        color: '#4736fe', 
+        color: '#4A35FE', 
         fontSize: '16px',
         fontFamily: 'Geist, sans-serif',
         lineHeight: '100%',
@@ -107,7 +107,7 @@ const BarRaiserLayout = ({ template, formData }) => {
           </div>
         )}
         <p style={{ 
-          color: '#4736fe', 
+          color: '#4A35FE', 
           fontSize: '12px',
           fontWeight: '500',
           letterSpacing: '2px',

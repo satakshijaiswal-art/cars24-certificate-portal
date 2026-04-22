@@ -1,8 +1,47 @@
-<svg width="150" height="32" viewBox="0 0 150 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- C icon with arrow -->
-  <circle cx="16" cy="16" r="14" stroke="#4A35FE" stroke-width="4" fill="none"/>
-  <path d="M22 16L16 10M22 16L16 22M22 16H8" stroke="#4A35FE" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-  
-  <!-- Cars24 text -->
-  <text x="40" y="24" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#4A35FE">Cars24</text>
+<svg width="220" height="60" viewBox="0 0 220 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- Purple rounded-square tile, 56×56 centred in 60px height (2px top offset) -->
+  <rect x="2" y="2" width="56" height="56" rx="13" fill="#4A35FE"/>
+
+  <!--
+    Stylised "C" glyph — white donut with gap on the right side.
+    Centre: (30, 30). Outer ring radius: 15. Inner (hole) radius: 9.
+    Gap from -50° to +50° (right side), i.e. opening faces 3 o'clock.
+    Using degrees: gap starts at -50° (310°) and ends at +50°.
+
+    Outer arc: 50° → 310° (clockwise = large arc)
+    Inner arc: 310° → 50° (counter-clockwise, tracing back)
+
+    Key points (cx=30, cy=30):
+      Outer top:    30 + 15·cos(50°), 30 - 15·sin(50°) = 30+9.64, 30-11.49 = 39.64, 18.51
+      Outer bot:    30 + 15·cos(50°), 30 + 15·sin(50°) = 39.64, 41.49
+      Inner top:    30 + 9·cos(50°),  30 - 9·sin(50°)  = 30+5.79, 30-6.89  = 35.79, 23.11
+      Inner bot:    30 + 9·cos(50°),  30 + 9·sin(50°)  = 35.79, 36.89
+  -->
+  <path
+    d="
+      M 39.64,18.51
+      A 15,15 0 1,0 39.64,41.49
+      L 35.79,36.89
+      A 9,9   0 1,1 35.79,23.11
+      Z
+    "
+    fill="#FFFFFF"
+  />
+
+  <!-- Small accent dot/bar in the C opening, centred at x≈42, y=30 -->
+  <circle cx="42" cy="30" r="2.5" fill="#FFFFFF"/>
+
+  <!-- "Cars24" wordmark to the right of the tile -->
+  <!-- Tile ends at x=58; gap of 12px; wordmark starts at x=70 -->
+  <text
+    x="70"
+    y="41"
+    font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif"
+    font-size="30"
+    font-weight="800"
+    fill="#4A35FE"
+    letter-spacing="-1"
+  >Cars24</text>
+
 </svg>

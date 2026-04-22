@@ -509,7 +509,7 @@ function App() {
               onClick={() => excelInputRef.current?.click()}
               className="hover:opacity-90 transition-all"
               style={{ 
-                background: '#4736FE',
+                background: '#4A35FE',
                 border: 'none',
                 padding: '10px 20px',
                 borderRadius: '10px',
@@ -698,9 +698,9 @@ function App() {
                   className="w-full flex items-center justify-center gap-2 text-white py-2 transition-all font-medium"
                   style={{ 
                     background: downloadProgress !== null 
-                      ? `linear-gradient(90deg, #4736FE ${downloadProgress}%, rgba(255,255,255,0.2) ${downloadProgress}%)`
+                      ? `linear-gradient(90deg, #4A35FE ${downloadProgress}%, rgba(255,255,255,0.2) ${downloadProgress}%)`
                       : selectedForDownload.length > 0 
-                        ? '#4736FE' 
+                        ? '#4A35FE' 
                         : 'rgba(255, 255, 255, 0.2)',
                     cursor: (selectedForDownload.length > 0 && downloadProgress === null) ? 'pointer' : 'not-allowed',
                     padding: '14px 24px',
@@ -716,7 +716,7 @@ function App() {
                   }}
                   onMouseOut={(e) => {
                     if (selectedForDownload.length > 0) {
-                      e.currentTarget.style.background = '#4736FE';
+                      e.currentTarget.style.background = '#4A35FE';
                     }
                   }}
                 >
@@ -1005,7 +1005,7 @@ function App() {
               style={{
                 flex: 1,
                 padding: '14px 24px',
-                background: unmatchedCategories.length > 0 ? '#333' : '#4736FE',
+                background: unmatchedCategories.length > 0 ? '#333' : '#4A35FE',
                 border: 'none',
                 borderRadius: '14px',
                 color: '#FFFFFF',
@@ -1077,7 +1077,7 @@ function App() {
           {missingDataAlert.type === 'upload' && missingDataAlert.columnNames && (
             <div style={{
               backgroundColor: 'rgba(71, 54, 254, 0.15)',
-              border: '1px solid #4736FE',
+              border: '1px solid #4A35FE',
               borderRadius: '8px',
               padding: '12px',
               marginBottom: '16px'
@@ -1205,7 +1205,7 @@ function App() {
                 style={{
                   flex: 1,
                   padding: '12px',
-                  backgroundColor: '#4736FE',
+                  backgroundColor: '#4A35FE',
                   border: 'none',
                   borderRadius: '8px',
                   color: '#FFFFFF',
