@@ -7,6 +7,7 @@ import Header from './components/Header';
 import LandingPage from './components/LandingPage';
 import PPTCreator from './components/PPTCreator';
 import PosterCreator from './components/PosterCreator';
+import JDCreator from './components/JDCreator';
 import TemplateSidebar from './components/TemplateSidebar';
 import EditPanel from './components/EditPanel';
 import CertificateCanvas from './components/CertificateCanvas';
@@ -16,7 +17,7 @@ import './index.css';
 const STATIC_USER = { name: 'Cars24 Team', email: '' };
 
 function App() {
-  const [activeSection, setActiveSection] = useState(null); // null = landing, 'certificate', 'ppt', 'poster'
+  const [activeSection, setActiveSection] = useState(null); // null = landing, 'certificate', 'ppt', 'poster', 'jd'
   const [selectedTemplate, setSelectedTemplate] = useState(templates[0]);
   const [certificates, setCertificates] = useState([]);
   const [selectedCertificateId, setSelectedCertificateId] = useState(1);
@@ -105,6 +106,18 @@ function App() {
         <Header user={STATIC_USER} />
         <div style={{ paddingTop: '60px' }}>
           <PosterCreator onBack={() => setActiveSection(null)} />
+        </div>
+      </>
+    );
+  }
+
+  // Show JD Creator
+  if (activeSection === 'jd') {
+    return (
+      <>
+        <Header user={STATIC_USER} />
+        <div style={{ paddingTop: '60px' }}>
+          <JDCreator onBack={() => setActiveSection(null)} />
         </div>
       </>
     );

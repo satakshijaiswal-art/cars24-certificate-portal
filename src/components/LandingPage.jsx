@@ -1,5 +1,5 @@
 import React from 'react';
-import { Award, Presentation, Image } from 'lucide-react';
+import { Award, Presentation, Image, Briefcase } from 'lucide-react';
 
 function LandingPage({ onSelectSection }) {
   return (
@@ -189,9 +189,9 @@ function LandingPage({ onSelectSection }) {
             textAlign: 'center'
           }}
           onMouseOver={(e) => {
-            e.currentTarget.style.border = '1px solid #FF6B9D';
+            e.currentTarget.style.border = '1px solid #4A35FE';
             e.currentTarget.style.transform = 'translateY(-8px)';
-            e.currentTarget.style.boxShadow = '0 20px 40px rgba(255, 107, 157, 0.3)';
+            e.currentTarget.style.boxShadow = '0 20px 40px rgba(74, 53, 254, 0.3)';
           }}
           onMouseOut={(e) => {
             e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.06)';
@@ -204,12 +204,12 @@ function LandingPage({ onSelectSection }) {
               width: '80px',
               height: '80px',
               borderRadius: '20px',
-              background: 'linear-gradient(135deg, #FF6B9D 0%, #FFA726 100%)',
+              background: 'linear-gradient(135deg, #4A35FE 0%, #8B7BFF 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               marginBottom: '24px',
-              boxShadow: '0 8px 24px rgba(255, 107, 157, 0.4)'
+              boxShadow: '0 8px 24px rgba(74, 53, 254, 0.35)'
             }}
           >
             <Image size={40} color="#FFFFFF" />
@@ -232,6 +232,69 @@ function LandingPage({ onSelectSection }) {
             }}
           >
             Design A4 festival wish posters and event announcement posters with festive templates.
+          </p>
+        </div>
+
+        {/* Job Description Creator Card */}
+        <div
+          onClick={() => onSelectSection('jd')}
+          style={{
+            width: '320px',
+            padding: '40px',
+            backgroundColor: '#252525',
+            borderRadius: '24px',
+            border: '1px solid rgba(255, 255, 255, 0.06)',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            textAlign: 'center'
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.border = '1px solid #4A35FE';
+            e.currentTarget.style.transform = 'translateY(-8px)';
+            e.currentTarget.style.boxShadow = '0 20px 40px rgba(74, 53, 254, 0.3)';
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.06)';
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = 'none';
+          }}
+        >
+          <div
+            style={{
+              width: '80px',
+              height: '80px',
+              borderRadius: '20px',
+              background: 'linear-gradient(135deg, #4A35FE 0%, #6B57FF 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: '24px',
+              boxShadow: '0 8px 24px rgba(74, 53, 254, 0.35)'
+            }}
+          >
+            <Briefcase size={40} color="#FFFFFF" />
+          </div>
+          <h2
+            style={{
+              color: '#FFFFFF',
+              fontSize: '24px',
+              fontWeight: '600',
+              marginBottom: '12px'
+            }}
+          >
+            Job Description
+          </h2>
+          <p
+            style={{
+              color: 'rgba(255, 255, 255, 0.5)',
+              fontSize: '14px',
+              lineHeight: '1.6'
+            }}
+          >
+            Create branded A4 job description posters with editable fields and downloadable PDF export.
           </p>
         </div>
       </div>

@@ -32,9 +32,9 @@ const formatDate = (dateStr) => {
 const Cars24LogoDark = () => (
   <>
     <img src="/cars24-logo.png" alt="Cars24"
-      style={{ height: '18px', objectFit: 'contain' }}
+      style={{ height: '28px', objectFit: 'contain' }}
       onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='block'; }} />
-    <span style={{ display: 'none', color: '#1A1A1A', fontSize: '16px', fontWeight: '800' }}>Cars24</span>
+    <span style={{ display: 'none', color: '#4A35FE', fontSize: '22px', fontWeight: '800', fontFamily: "'Inter', sans-serif", letterSpacing: '-0.5px' }}>Cars24</span>
   </>
 );
 
@@ -42,9 +42,9 @@ const Cars24LogoDark = () => (
 const Cars24LogoWhite = () => (
   <>
     <img src="/cars24-logo.png" alt="Cars24"
-      style={{ height: '18px', objectFit: 'contain', filter: 'brightness(0) invert(1)' }}
+      style={{ height: '28px', objectFit: 'contain', filter: 'brightness(0) invert(1)' }}
       onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='block'; }} />
-    <span style={{ display: 'none', color: '#FFFFFF', fontSize: '16px', fontWeight: '800' }}>Cars24</span>
+    <span style={{ display: 'none', color: '#FFFFFF', fontSize: '22px', fontWeight: '800', fontFamily: "'Inter', sans-serif", letterSpacing: '-0.5px' }}>Cars24</span>
   </>
 );
 
@@ -65,7 +65,7 @@ const UploadedImageBlock = ({ src }) => {
 // SVG MOTIF COMPONENTS — rich multi-element compositions
 // ═══════════════════════════════════════════════════════════════════════════════
 
-// DIWALI — midnight blue BG, gold diyas cascading sides, rangoli bottom, glow
+// DIWALI — pale purple BG, Cars24 purple diyas cascading sides, gold flame accent, rangoli
 const DiwaliMotif = ({ accentColor, accentColor2 }) => (
   <svg style={{ position:'absolute', inset:0, width:'100%', height:'100%', pointerEvents:'none', overflow:'hidden' }}
     viewBox="0 0 595 842" preserveAspectRatio="xMidYMid slice">
@@ -85,24 +85,24 @@ const DiwaliMotif = ({ accentColor, accentColor2 }) => (
         rx="9" ry="4" fill={accentColor} opacity="0.3"
         transform={`rotate(${(i/16)*360},${297+Math.cos(a)*80},${800+Math.sin(a)*25})`} />;
     })}
-    {/* Warm glow behind centre */}
+    {/* Soft purple glow behind centre */}
     <radialGradient id="diwaliGlow" cx="50%" cy="52%" r="45%">
-      <stop offset="0%" stopColor="#FF6B00" stopOpacity="0.18" />
-      <stop offset="100%" stopColor="#FF6B00" stopOpacity="0" />
+      <stop offset="0%" stopColor={accentColor} stopOpacity="0.10" />
+      <stop offset="100%" stopColor={accentColor} stopOpacity="0" />
     </radialGradient>
     <ellipse cx="297" cy="430" rx="200" ry="180" fill="url(#diwaliGlow)" />
-    {/* Diyas along both sides, staggered */}
+    {/* Diyas along both sides — base in Cars24 purple, flame in gold accent */}
     {[
       [50,260],[50,360],[50,460],[50,560],[50,660],
       [545,260],[545,360],[545,460],[545,560],[545,660],
       [100,700],[200,740],[297,760],[394,740],[495,700],
     ].map(([cx,cy],i) => (
       <g key={`d${i}`} transform={`translate(${cx},${cy})`}>
-        <ellipse rx="11" ry="6" fill="#8B4513" opacity="0.8" />
-        <ellipse rx="7" ry="4" cy="-2" fill="#D2691E" opacity="0.6" />
-        <path d={`M0,-7 Q5,-17 0,-24 Q-5,-17 0,-7`} fill={accentColor2} opacity="0.9" />
-        <path d={`M0,-9 Q3,-16 0,-21 Q-3,-16 0,-9`} fill={accentColor} opacity="0.95" />
-        <ellipse cx="0" cy="-14" rx="3" ry="5" fill="rgba(255,200,50,0.25)" />
+        <ellipse rx="11" ry="6" fill={accentColor} opacity="0.55" />
+        <ellipse rx="7" ry="4" cy="-2" fill="#6B57FF" opacity="0.45" />
+        <path d={`M0,-7 Q5,-17 0,-24 Q-5,-17 0,-7`} fill={accentColor2} opacity="0.85" />
+        <path d={`M0,-9 Q3,-16 0,-21 Q-3,-16 0,-9`} fill="#FFD54F" opacity="0.90" />
+        <ellipse cx="0" cy="-14" rx="3" ry="5" fill="rgba(255,210,60,0.20)" />
       </g>
     ))}
     {/* Gold star ornaments at corners */}
@@ -124,42 +124,42 @@ const DiwaliMotif = ({ accentColor, accentColor2 }) => (
   </svg>
 );
 
-// HOLI — white/cream BG, vibrant colour splashes, paint drips
-const HoliMotif = () => (
+// HOLI — pale-purple BG, purple-dominant splashes, magenta/yellow festival accents
+const HoliMotif = ({ accentColor, accentColor2 }) => (
   <svg style={{ position:'absolute', inset:0, width:'100%', height:'100%', pointerEvents:'none', overflow:'hidden' }}
     viewBox="0 0 595 842" preserveAspectRatio="xMidYMid slice">
-    {/* Large corner splashes */}
-    <ellipse cx="0" cy="200" rx="130" ry="100" fill="#FF1493" opacity="0.18" transform="rotate(-20,0,200)" />
-    <ellipse cx="595" cy="200" rx="120" ry="90" fill="#00CED1" opacity="0.16" transform="rotate(20,595,200)" />
-    <ellipse cx="0" cy="650" rx="140" ry="105" fill="#FFD700" opacity="0.18" transform="rotate(15,0,650)" />
-    <ellipse cx="595" cy="650" rx="130" ry="95" fill="#FF6B00" opacity="0.16" transform="rotate(-15,595,650)" />
-    <ellipse cx="297" cy="700" rx="160" ry="70" fill="#7B68EE" opacity="0.1" />
-    {/* Mid splashes */}
-    <ellipse cx="60" cy="420" rx="70" ry="55" fill="#00FF7F" opacity="0.12" transform="rotate(-10)" />
-    <ellipse cx="535" cy="440" rx="65" ry="50" fill="#FF4500" opacity="0.12" transform="rotate(10)" />
-    <ellipse cx="150" cy="120" rx="80" ry="50" fill="#FF69B4" opacity="0.14" />
-    <ellipse cx="445" cy="110" rx="75" ry="48" fill="#4169E1" opacity="0.12" />
-    {/* Paint drip blobs — top */}
+    {/* Large corner splashes — 70% purple tones */}
+    <ellipse cx="0" cy="200" rx="130" ry="100" fill={accentColor} opacity="0.14" transform="rotate(-20,0,200)" />
+    <ellipse cx="595" cy="200" rx="120" ry="90" fill="#6B57FF" opacity="0.12" transform="rotate(20,595,200)" />
+    <ellipse cx="0" cy="650" rx="140" ry="105" fill={accentColor} opacity="0.12" transform="rotate(15,0,650)" />
+    <ellipse cx="595" cy="650" rx="130" ry="95" fill="#8B7BFF" opacity="0.12" transform="rotate(-15,595,650)" />
+    <ellipse cx="297" cy="700" rx="160" ry="70" fill={accentColor} opacity="0.08" />
+    {/* Mid splashes — mix of purple + magenta accents */}
+    <ellipse cx="60" cy="420" rx="70" ry="55" fill={accentColor} opacity="0.10" transform="rotate(-10)" />
+    <ellipse cx="535" cy="440" rx="65" ry="50" fill={accentColor2} opacity="0.10" transform="rotate(10)" />
+    <ellipse cx="150" cy="120" rx="80" ry="50" fill={accentColor} opacity="0.12" />
+    <ellipse cx="445" cy="110" rx="75" ry="48" fill="#8B7BFF" opacity="0.10" />
+    {/* Paint drip blobs — top — purple dominant, magenta accent */}
     {[40,100,180,260,340,420,500,570].map((x,i) => {
-      const colors = ['#FF1493','#00CED1','#FFD700','#FF6B00','#7B68EE','#00FF7F','#FF4500','#4169E1'];
+      const colors = [accentColor,'#6B57FF',accentColor,'#8B7BFF',accentColor2,accentColor,'#6B57FF',accentColor2];
       const h = 18 + (i%3)*8;
       return (
         <g key={`drip${i}`}>
-          <rect x={x-8} y={0} width={16} height={h} rx="8" fill={colors[i]} opacity="0.3" />
-          <ellipse cx={x} cy={h} rx="9" ry="7" fill={colors[i]} opacity="0.3" />
+          <rect x={x-8} y={0} width={16} height={h} rx="8" fill={colors[i]} opacity="0.25" />
+          <ellipse cx={x} cy={h} rx="9" ry="7" fill={colors[i]} opacity="0.25" />
         </g>
       );
     })}
-    {/* Scattered powder circles */}
+    {/* Scattered powder circles — purple dominant, magenta accent */}
     {[[80,300],[515,280],[40,580],[555,590],[180,760],[415,750],[100,480],[490,460],[250,650],[350,660]].map(([x,y],i) => (
       <circle key={`pw${i}`} cx={x} cy={y} r={14+i*3}
-        fill={['#FF1493','#00CED1','#FFD700','#FF6B00','#7B68EE','#00FF7F','#FF4500','#4169E1','#FF69B4','#98FF98'][i]}
-        opacity="0.18" />
+        fill={[accentColor,'#6B57FF',accentColor2,accentColor,'#8B7BFF',accentColor,'#6B57FF',accentColor2,accentColor,'#8B7BFF'][i]}
+        opacity="0.16" />
     ))}
-    {/* Small dots scattered */}
+    {/* Small dots scattered — purple tones */}
     {Array.from({length:20}).map((_,i) => (
       <circle key={`sd${i}`} cx={30+(i*179)%535} cy={200+(i*113)%580}
-        r={4+(i%4)} fill={['#FF1493','#FFD700','#00CED1','#FF6B00'][i%4]} opacity="0.25" />
+        r={4+(i%4)} fill={[accentColor,'#6B57FF',accentColor2,'#8B7BFF'][i%4]} opacity="0.20" />
     ))}
   </svg>
 );
@@ -178,10 +178,10 @@ const EidMotif = ({ accentColor, accentColor2 }) => (
         <polygon points="0,-12 7,0 0,12 -7,0" fill={accentColor} opacity="0.5" />
       </g>
     ))}
-    {/* Large crescent moon — centre-top of body */}
+    {/* Large crescent moon — centre-top of body, purple with cutout matching bg */}
     <g transform="translate(297, 370)" opacity="0.22">
       <circle cx="-10" cy="0" r="62" fill={accentColor} />
-      <circle cx="24" cy="0" r="52" fill="#0A3D2E" />
+      <circle cx="24" cy="0" r="52" fill="#F0EEFF" />
     </g>
     {/* Stars around crescent */}
     {[[297,300],[340,325],[255,318],[297,255],[335,260],[260,263]].map(([x,y],i) => (
@@ -215,23 +215,23 @@ const EidMotif = ({ accentColor, accentColor2 }) => (
   </svg>
 );
 
-// CHRISTMAS — snowy white + forest green + deep red, snowflakes, pine branches
+// CHRISTMAS — pale purple BG, Cars24 purple snowflakes + pine, red berry accents
 const ChristmasMotif = ({ accentColor, secondaryColor }) => (
   <svg style={{ position:'absolute', inset:0, width:'100%', height:'100%', pointerEvents:'none', overflow:'hidden' }}
     viewBox="0 0 595 842" preserveAspectRatio="xMidYMid slice">
-    {/* Pine branches — bottom corners */}
+    {/* Pine branches — bottom corners, Cars24 purple */}
     {[
       [0, 842, 1], [595, 842, -1]
     ].map(([bx, by, flip], bi) => (
-      <g key={`branch${bi}`} transform={`translate(${bx},${by}) scale(${flip},1)`} opacity="0.3">
-        <ellipse cx="30" cy="-30" rx="35" ry="14" fill={secondaryColor} transform="rotate(-35,30,-30)" />
-        <ellipse cx="10" cy="-55" rx="30" ry="12" fill={secondaryColor} transform="rotate(-45,10,-55)" />
-        <ellipse cx="55" cy="-12" rx="40" ry="14" fill={secondaryColor} transform="rotate(-20,55,-12)" />
-        <ellipse cx="70" cy="-45" rx="32" ry="12" fill={secondaryColor} transform="rotate(-30,70,-45)" />
-        {/* Berries */}
-        <circle cx="22" cy="-46" r="5" fill={accentColor} opacity="0.8" />
-        <circle cx="35" cy="-52" r="5" fill={accentColor} opacity="0.8" />
-        <circle cx="14" cy="-40" r="4" fill={accentColor} opacity="0.8" />
+      <g key={`branch${bi}`} transform={`translate(${bx},${by}) scale(${flip},1)`} opacity="0.28">
+        <ellipse cx="30" cy="-30" rx="35" ry="14" fill={accentColor} transform="rotate(-35,30,-30)" />
+        <ellipse cx="10" cy="-55" rx="30" ry="12" fill={accentColor} transform="rotate(-45,10,-55)" />
+        <ellipse cx="55" cy="-12" rx="40" ry="14" fill="#6B57FF" transform="rotate(-20,55,-12)" />
+        <ellipse cx="70" cy="-45" rx="32" ry="12" fill={accentColor} transform="rotate(-30,70,-45)" />
+        {/* Red berries — festival accent, small */}
+        <circle cx="22" cy="-46" r="5" fill={secondaryColor} opacity="0.85" />
+        <circle cx="35" cy="-52" r="5" fill={secondaryColor} opacity="0.85" />
+        <circle cx="14" cy="-40" r="4" fill={secondaryColor} opacity="0.85" />
       </g>
     ))}
     {/* Top corner pine sprigs */}
@@ -239,58 +239,61 @@ const ChristmasMotif = ({ accentColor, secondaryColor }) => (
       [0, 168, 1], [595, 168, -1]
     ].map(([bx, by, flip], bi) => (
       <g key={`topbranch${bi}`} transform={`translate(${bx},${by}) scale(${flip},1)`} opacity="0.22">
-        <ellipse cx="30" cy="20" rx="32" ry="12" fill={secondaryColor} transform="rotate(35,30,20)" />
-        <ellipse cx="60" cy="10" rx="28" ry="11" fill={secondaryColor} transform="rotate(20,60,10)" />
-        <circle cx="42" cy="28" r="4" fill={accentColor} opacity="0.9" />
-        <circle cx="55" cy="22" r="4" fill={accentColor} opacity="0.9" />
+        <ellipse cx="30" cy="20" rx="32" ry="12" fill={accentColor} transform="rotate(35,30,20)" />
+        <ellipse cx="60" cy="10" rx="28" ry="11" fill="#6B57FF" transform="rotate(20,60,10)" />
+        <circle cx="42" cy="28" r="4" fill={secondaryColor} opacity="0.9" />
+        <circle cx="55" cy="22" r="4" fill={secondaryColor} opacity="0.9" />
       </g>
     ))}
-    {/* Christmas tree silhouette — faint backdrop */}
+    {/* Christmas tree silhouette — faint purple backdrop */}
     <g transform="translate(297, 560)" opacity="0.05">
-      <polygon points="0,-100 -60,20 60,20" fill={secondaryColor} />
-      <polygon points="0,-60 -80,50 80,50" fill={secondaryColor} />
-      <polygon points="0,-20 -100,80 100,80" fill={secondaryColor} />
-      <rect x="-14" y="80" width="28" height="22" fill="#8B4513" />
+      <polygon points="0,-100 -60,20 60,20" fill={accentColor} />
+      <polygon points="0,-60 -80,50 80,50" fill={accentColor} />
+      <polygon points="0,-20 -100,80 100,80" fill={accentColor} />
+      <rect x="-14" y="80" width="28" height="22" fill="#2E1FCC" />
     </g>
-    {/* Snowflakes — many sizes, distributed */}
+    {/* Snowflakes — Cars24 purple (most) + a few red accents */}
     {[
       [80,220,16],[515,240,14],[150,300,10],[445,280,12],
       [60,450,18],[535,430,14],[200,540,10],[395,560,12],
       [100,680,12],[490,670,10],[250,740,8],[345,730,10],
       [297,350,20],[40,350,8],[555,350,8],[180,180,9],[410,185,9],
-    ].map(([x,y,sz],i) => (
-      <g key={`snow${i}`} transform={`translate(${x},${y})`} opacity="0.25">
+    ].map(([x,y,sz],i) => {
+      const snowColor = i < 4 ? secondaryColor : (i < 6 ? '#8B7BFF' : accentColor);
+      return (
+      <g key={`snow${i}`} transform={`translate(${x},${y})`} opacity="0.22">
         {[0,30,60,90,120,150].map(a => (
           <g key={a} transform={`rotate(${a})`}>
-            <line x1="0" y1={-sz} x2="0" y2={sz} stroke={i<5?'#B0C0B0':'#C0D0C0'} strokeWidth="1.2" />
-            <line x1={-sz*0.5} y1={-sz*0.6} x2={sz*0.5} y2={sz*0.6} stroke={i<5?'#B0C0B0':'#C0D0C0'} strokeWidth="1" />
-            <line x1={-sz*0.4} y1={0} x2={-sz*0.8} y2={-sz*0.35} stroke={i<5?'#B0C0B0':'#C0D0C0'} strokeWidth="0.9" />
-            <line x1={sz*0.4} y1={0} x2={sz*0.8} y2={sz*0.35} stroke={i<5?'#B0C0B0':'#C0D0C0'} strokeWidth="0.9" />
+            <line x1="0" y1={-sz} x2="0" y2={sz} stroke={snowColor} strokeWidth="1.2" />
+            <line x1={-sz*0.5} y1={-sz*0.6} x2={sz*0.5} y2={sz*0.6} stroke={snowColor} strokeWidth="1" />
+            <line x1={-sz*0.4} y1={0} x2={-sz*0.8} y2={-sz*0.35} stroke={snowColor} strokeWidth="0.9" />
+            <line x1={sz*0.4} y1={0} x2={sz*0.8} y2={sz*0.35} stroke={snowColor} strokeWidth="0.9" />
           </g>
         ))}
-        <circle cx="0" cy="0" r="2" fill="white" opacity="0.6" />
+        <circle cx="0" cy="0" r="2" fill={snowColor} opacity="0.5" />
       </g>
-    ))}
-    {/* Red ribbon accent lines */}
+      );
+    })}
+    {/* Cars24 purple accent lines at top/bottom */}
     <path d="M 0 165 Q 150 185 297 168 Q 445 152 595 165" fill="none" stroke={accentColor} strokeWidth="2" opacity="0.15" />
     <path d="M 0 840 Q 150 820 297 840 Q 445 856 595 840" fill="none" stroke={accentColor} strokeWidth="2" opacity="0.15" />
   </svg>
 );
 
-// NEW YEAR — midnight blue, fireworks, confetti, champagne gold
+// NEW YEAR — pale purple BG, Cars24 purple fireworks + confetti, gold accent
 const NewYearMotif = ({ accentColor, accentColor2 }) => (
   <svg style={{ position:'absolute', inset:0, width:'100%', height:'100%', pointerEvents:'none', overflow:'hidden' }}
     viewBox="0 0 595 842" preserveAspectRatio="xMidYMid slice">
-    {/* Fireworks bursts */}
+    {/* Fireworks bursts — purple primary, gold accent */}
     {[
-      [100,280,28,'#FFD700'],[500,260,24,'#C0C0C0'],
-      [60,480,20,'#FF69B4'],[530,500,22,'#00FFFF'],
-      [200,600,18,'#FFD700'],[390,580,20,'#FF69B4'],
-      [297,330,32,'#FFD700'],
+      [100,280,28,accentColor],[500,260,24,'#6B57FF'],
+      [60,480,20,accentColor],[530,500,22,'#8B7BFF'],
+      [200,600,18,accentColor2],[390,580,20,accentColor],
+      [297,330,32,accentColor],
     ].map(([cx,cy,sz,col],i) => {
       const rays = 12 + i*2;
       return (
-        <g key={`fw${i}`} transform={`translate(${cx},${cy})`} opacity="0.3">
+        <g key={`fw${i}`} transform={`translate(${cx},${cy})`} opacity="0.28">
           {Array.from({length:rays}).map((_,r) => {
             const a = (r/rays)*Math.PI*2;
             const inner = sz*0.3;
@@ -307,21 +310,21 @@ const NewYearMotif = ({ accentColor, accentColor2 }) => (
         </g>
       );
     })}
-    {/* Confetti squares */}
+    {/* Confetti squares — purple dominant */}
     {Array.from({length:35}).map((_,i) => (
       <rect key={`cf${i}`}
         x={(i*97+30)%535} y={180+(i*137)%620}
         width={4+(i%3)*2} height={4+(i%3)*2}
-        fill={['#FFD700','#C0C0C0','#FF69B4','#00FFFF','#FF6B00'][i%5]}
-        opacity="0.25" transform={`rotate(${i*37})`} />
+        fill={[accentColor,'#6B57FF',accentColor2,'#8B7BFF',accentColor][i%5]}
+        opacity="0.22" transform={`rotate(${i*37})`} />
     ))}
-    {/* Champagne circles — mimosa bubbles */}
+    {/* Champagne circles — gold accent bubbles */}
     {Array.from({length:15}).map((_,i) => (
       <circle key={`bub${i}`}
         cx={260+(i%4)*25} cy={700-(i*40)%320}
-        r={3+(i%3)} fill={accentColor} opacity="0.2" />
+        r={3+(i%3)} fill={accentColor2} opacity="0.25" />
     ))}
-    {/* Clock face centre — faint */}
+    {/* Clock face centre — faint Cars24 purple */}
     <g transform="translate(297, 430)" opacity="0.08">
       <circle cx="0" cy="0" r="50" fill="none" stroke={accentColor} strokeWidth="2.5" />
       <circle cx="0" cy="0" r="44" fill="none" stroke={accentColor} strokeWidth="1" />
@@ -335,70 +338,69 @@ const NewYearMotif = ({ accentColor, accentColor2 }) => (
       <line x1="0" y1="0" x2="22" y2="0" stroke={accentColor} strokeWidth="2" />
       <circle cx="0" cy="0" r="4" fill={accentColor} />
     </g>
-    {/* Star dust dots */}
+    {/* Star dust dots — purple */}
     {[[40,220],[555,210],[80,700],[510,680],[180,170],[415,175]].map(([x,y],i) => (
       <polygon key={`sd2${i}`}
         points={`${x},${y-7} ${x+2},${y-2} ${x+7},${y-2} ${x+3},${y+1} ${x+4},${y+7} ${x},${y+4} ${x-4},${y+7} ${x-3},${y+1} ${x-7},${y-2} ${x-2},${y-2}`}
-        fill={accentColor} opacity="0.3" />
+        fill={accentColor} opacity="0.28" />
     ))}
   </svg>
 );
 
-// INDEPENDENCE DAY — tricolour stripes BG, Ashoka Chakra backdrop, patriotic
-const IndependenceMotif = ({ accentColor, accentColor2 }) => (
+// INDEPENDENCE DAY — pale purple BG, Cars24 purple Chakra, saffron/green tricolour accents
+const IndependenceMotif = ({ accentColor, accentColor2, secondaryColor }) => (
   <svg style={{ position:'absolute', inset:0, width:'100%', height:'100%', pointerEvents:'none', overflow:'hidden' }}
     viewBox="0 0 595 842" preserveAspectRatio="xMidYMid slice">
-    {/* Large Ashoka Chakra backdrop */}
+    {/* Large Ashoka Chakra — Cars24 purple */}
     <g transform="translate(297, 430)" opacity="0.12">
-      <circle cx="0" cy="0" r="130" fill="none" stroke="#000080" strokeWidth="6" />
-      <circle cx="0" cy="0" r="110" fill="none" stroke="#000080" strokeWidth="2" />
-      <circle cx="0" cy="0" r="18" fill="#000080" />
+      <circle cx="0" cy="0" r="130" fill="none" stroke={accentColor} strokeWidth="6" />
+      <circle cx="0" cy="0" r="110" fill="none" stroke={accentColor} strokeWidth="2" />
+      <circle cx="0" cy="0" r="18" fill={accentColor} />
       {Array.from({length:24}).map((_,i) => {
         const a = (i/24)*Math.PI*2;
         return (
           <g key={i}>
             <line x1={Math.cos(a)*20} y1={Math.sin(a)*20}
               x2={Math.cos(a)*108} y2={Math.sin(a)*108}
-              stroke="#000080" strokeWidth="2" />
-            {/* Spoke tip arrow */}
-            <circle cx={Math.cos(a)*108} cy={Math.sin(a)*108} r="3" fill="#000080" />
+              stroke={accentColor} strokeWidth="2" />
+            <circle cx={Math.cos(a)*108} cy={Math.sin(a)*108} r="3" fill={accentColor} />
           </g>
         );
       })}
     </g>
-    {/* Star decorations — corners */}
+    {/* Star decorations — corners, purple */}
     {[[30,185],[565,185],[30,812],[565,812]].map(([x,y],i) => (
       <polygon key={`ist${i}`}
         points={`${x},${y-10} ${x+3},${y-3} ${x+10},${y-3} ${x+4},${y+2} ${x+6},${y+10} ${x},${y+6} ${x-6},${y+10} ${x-4},${y+2} ${x-10},${y-3} ${x-3},${y-3}`}
-        fill={i%2===0?accentColor:accentColor2} opacity="0.6" />
+        fill={accentColor} opacity="0.45" />
     ))}
-    {/* Tricolour ribbon bands — decorative side stripes */}
-    <rect x="20" y="168" width="8" height="30" rx="3" fill={accentColor} opacity="0.5" />
-    <rect x="20" y="198" width="8" height="30" rx="3" fill="#FFFFFF" opacity="0.4" />
-    <rect x="20" y="228" width="8" height="30" rx="3" fill={accentColor2} opacity="0.5" />
-    <rect x="567" y="168" width="8" height="30" rx="3" fill={accentColor} opacity="0.5" />
-    <rect x="567" y="198" width="8" height="30" rx="3" fill="#FFFFFF" opacity="0.4" />
-    <rect x="567" y="228" width="8" height="30" rx="3" fill={accentColor2} opacity="0.5" />
-    {/* India Gate silhouette — faint */}
-    <g transform="translate(297, 750)" opacity="0.1">
-      <rect x="-4" y="-90" width="8" height="90" fill="#000080" />
-      <path d="M -35 0 Q -35 -50 0 -90 Q 35 -50 35 0 Z" fill="none" stroke="#000080" strokeWidth="3" />
-      <rect x="-40" y="0" width="80" height="8" fill="#000080" />
-      <rect x="-55" y="8" width="110" height="10" fill="#000080" />
-      <rect x="-6" y="-100" width="12" height="8" fill="#000080" />
+    {/* Tricolour ribbon bands — saffron/white/green as festival accents on sides */}
+    <rect x="20" y="168" width="8" height="30" rx="3" fill={accentColor2} opacity="0.55" />
+    <rect x="20" y="198" width="8" height="30" rx="3" fill="#FFFFFF" opacity="0.5" />
+    <rect x="20" y="228" width="8" height="30" rx="3" fill={secondaryColor} opacity="0.55" />
+    <rect x="567" y="168" width="8" height="30" rx="3" fill={accentColor2} opacity="0.55" />
+    <rect x="567" y="198" width="8" height="30" rx="3" fill="#FFFFFF" opacity="0.5" />
+    <rect x="567" y="228" width="8" height="30" rx="3" fill={secondaryColor} opacity="0.55" />
+    {/* India Gate silhouette — Cars24 purple */}
+    <g transform="translate(297, 750)" opacity="0.10">
+      <rect x="-4" y="-90" width="8" height="90" fill={accentColor} />
+      <path d="M -35 0 Q -35 -50 0 -90 Q 35 -50 35 0 Z" fill="none" stroke={accentColor} strokeWidth="3" />
+      <rect x="-40" y="0" width="80" height="8" fill={accentColor} />
+      <rect x="-55" y="8" width="110" height="10" fill={accentColor} />
+      <rect x="-6" y="-100" width="12" height="8" fill={accentColor} />
     </g>
-    {/* Dotted border */}
+    {/* Dotted border — purple */}
     {Array.from({length:18}).map((_,i) => (
-      <circle key={`idb${i}`} cx={50+i*28} cy={185} r="2" fill="#000080" opacity="0.15" />
+      <circle key={`idb${i}`} cx={50+i*28} cy={185} r="2" fill={accentColor} opacity="0.18" />
     ))}
     {Array.from({length:18}).map((_,i) => (
-      <circle key={`idb2${i}`} cx={50+i*28} cy={820} r="2" fill="#000080" opacity="0.15" />
+      <circle key={`idb2${i}`} cx={50+i*28} cy={820} r="2" fill={accentColor} opacity="0.18" />
     ))}
   </svg>
 );
 
-// REPUBLIC DAY — formal, India Gate, Chakra, gold accents on cream
-const RepublicMotif = ({ accentColor, accentColor2 }) => (
+// REPUBLIC DAY — pale purple BG, Cars24 purple Chakra + India Gate, tricolour accents
+const RepublicMotif = ({ accentColor, accentColor2, secondaryColor }) => (
   <svg style={{ position:'absolute', inset:0, width:'100%', height:'100%', pointerEvents:'none', overflow:'hidden' }}
     viewBox="0 0 595 842" preserveAspectRatio="xMidYMid slice">
     {/* Gold border frame */}
@@ -411,32 +413,32 @@ const RepublicMotif = ({ accentColor, accentColor2 }) => (
         <circle cx="0" cy="0" r="4" fill={accentColor} />
       </g>
     ))}
-    {/* Ashoka Chakra */}
+    {/* Ashoka Chakra — Cars24 purple */}
     <g transform="translate(297, 430)" opacity="0.1">
-      <circle cx="0" cy="0" r="110" fill="none" stroke="#000080" strokeWidth="5" />
-      <circle cx="0" cy="0" r="93" fill="none" stroke="#000080" strokeWidth="1.5" />
-      <circle cx="0" cy="0" r="16" fill="#000080" />
+      <circle cx="0" cy="0" r="110" fill="none" stroke={accentColor} strokeWidth="5" />
+      <circle cx="0" cy="0" r="93" fill="none" stroke={accentColor} strokeWidth="1.5" />
+      <circle cx="0" cy="0" r="16" fill={accentColor} />
       {Array.from({length:24}).map((_,i) => {
         const a = (i/24)*Math.PI*2;
         return <line key={i} x1={Math.cos(a)*18} y1={Math.sin(a)*18}
           x2={Math.cos(a)*91} y2={Math.sin(a)*91}
-          stroke="#000080" strokeWidth="2.5" />;
+          stroke={accentColor} strokeWidth="2.5" />;
       })}
     </g>
-    {/* India Gate — more prominent */}
+    {/* India Gate — Cars24 purple */}
     <g transform="translate(297, 760)" opacity="0.12">
-      <rect x="-5" y="-100" width="10" height="100" fill="#1A1A6E" />
-      <path d="M -40 0 Q -40 -60 0 -100 Q 40 -60 40 0 Z" fill="none" stroke="#1A1A6E" strokeWidth="4" />
-      <rect x="-50" y="0" width="100" height="10" fill="#1A1A6E" />
-      <rect x="-65" y="10" width="130" height="12" fill="#1A1A6E" />
-      <rect x="-8" y="-112" width="16" height="10" fill="#1A1A6E" />
+      <rect x="-5" y="-100" width="10" height="100" fill={accentColor} />
+      <path d="M -40 0 Q -40 -60 0 -100 Q 40 -60 40 0 Z" fill="none" stroke={accentColor} strokeWidth="4" />
+      <rect x="-50" y="0" width="100" height="10" fill={accentColor} />
+      <rect x="-65" y="10" width="130" height="12" fill={accentColor} />
+      <rect x="-8" y="-112" width="16" height="10" fill={accentColor} />
     </g>
     {/* Tricolour stripe accents */}
     {[[0,1],[1,0]].map((_,side) => (
       <g key={`ts${side}`} transform={`translate(${side===0?20:567},400)`} opacity="0.35">
-        <rect x="0" y="-30" width="8" height="20" rx="2" fill={accentColor} />
+        <rect x="0" y="-30" width="8" height="20" rx="2" fill={accentColor2} />
         <rect x="0" y="-10" width="8" height="20" rx="2" fill="#FFFFFF" opacity="0.8" />
-        <rect x="0" y="10" width="8" height="20" rx="2" fill={accentColor2} />
+        <rect x="0" y="10" width="8" height="20" rx="2" fill={secondaryColor || '#138808'} />
       </g>
     ))}
     {/* Stars at top */}
@@ -517,7 +519,7 @@ const GaneshMotif = ({ accentColor, accentColor2 }) => (
         {[0,36,72,108,144,180,216,252,288,324].map(a => {
           const rad = (a*Math.PI)/180;
           return <ellipse key={a} cx={Math.cos(rad)*12} cy={Math.sin(rad)*12}
-            rx="10" ry="4" fill={i%2===0?'#FF6B00':accentColor2}
+            rx="10" ry="4" fill={i%2===0?accentColor:accentColor2}
             transform={`rotate(${a},${Math.cos(rad)*12},${Math.sin(rad)*12})`} />;
         })}
         <circle cx="0" cy="0" r="5" fill={accentColor2} />
@@ -1121,12 +1123,11 @@ const motifComponents = {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 // Determine if a background is dark (needs white text for Cars24 wordmark)
+// All festival templates now use pale purple / off-white backgrounds → always light
 const isDarkBg = (template) => {
-  const bg = template.posterBg || '';
-  const darkKeywords = ['#0','#1','#2','#3','linear-gradient(1','linear-gradient(16','linear-gradient(13'];
-  return darkKeywords.some(k => bg.includes(k)) || template.id === 'navratri' ||
-    template.id === 'ganesh-chaturthi' || template.id === 'dussehra' ||
-    template.id === 'ganesh-chaturthi';
+  // Event announcements use dark purple header strip — logo appears there in white already
+  // Festival templates are all pale/light now
+  return false;
 };
 
 const FestivalWishesCanvas = ({ template, formData }) => {
@@ -1149,6 +1150,8 @@ const FestivalWishesCanvas = ({ template, formData }) => {
   // Headline effect → CSS style additions
   const headlineStyle = (() => {
     switch (template.headlineEffect) {
+      case 'brand-purple':
+        return { color: '#4A35FE', textShadow: '0 2px 12px rgba(74,53,254,0.18)' };
       case 'gold-glow':
         return { color: accentColor, textShadow: `0 0 40px ${accentColor}88, 0 2px 4px rgba(0,0,0,0.4)` };
       case 'gold-serif':
@@ -1197,7 +1200,7 @@ const FestivalWishesCanvas = ({ template, formData }) => {
     }}>
       {/* Full-poster motif layer — behind everything */}
       <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-        <MotifComponent accentColor={accentColor} accentColor2={accent2} secondaryColor={accent2} />
+        <MotifComponent accentColor={accentColor} accentColor2={accent2} secondaryColor={template.secondaryColor || accent2} />
       </div>
 
       {/* ── Small Cars24 wordmark — top-left corner, unobtrusive ── */}
