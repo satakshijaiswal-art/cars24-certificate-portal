@@ -24,20 +24,40 @@ const FONT_DISPLAY = "'Playfair Display', Georgia, serif";
 const W = 595;
 const H = 842;
 
-// ─── Logo — uses SVG variants from /public ────────────────────────────────────
-const Logo = ({ height = 40, invert = false, style: extraStyle = {} }) => (
-  <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, ...extraStyle }}>
-    <img
-      src={import.meta.env.BASE_URL + (invert ? 'cars24-logo-white.svg' : 'cars24-logo.svg')}
-      alt="Cars24"
-      style={{
-        height: `${height}px`,
-        objectFit: 'contain',
-        display: 'block',
-      }}
-    />
-  </div>
-);
+// ─── Logo — uses official PNG from /public ────────────────────────────────────
+// invert=true → wrap in white chip (for purple backgrounds)
+// invert=false → render directly (for white/light backgrounds)
+const Logo = ({ height = 40, invert = false, style: extraStyle = {} }) => {
+  if (invert) {
+    return (
+      <div style={{ display: 'inline-flex', alignItems: 'center', flexShrink: 0, ...extraStyle }}>
+        <div style={{
+          background: '#FFFFFF',
+          borderRadius: 10,
+          padding: '5px 9px',
+          display: 'inline-block',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.10)',
+          lineHeight: 0,
+        }}>
+          <img
+            src={import.meta.env.BASE_URL + 'cars24-logo.png'}
+            alt="Cars24"
+            style={{ height: `${height}px`, objectFit: 'contain', display: 'block' }}
+          />
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, ...extraStyle }}>
+      <img
+        src={import.meta.env.BASE_URL + 'cars24-logo.png'}
+        alt="Cars24"
+        style={{ height: `${height}px`, objectFit: 'contain', display: 'block' }}
+      />
+    </div>
+  );
+};
 
 // ─── Small-caps eyebrow / label ───────────────────────────────────────────────
 const Eyebrow = ({ children, color = 'rgba(255,255,255,0.6)', size = '8px', spacing = '2.5px' }) => (

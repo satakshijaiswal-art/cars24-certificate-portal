@@ -29,21 +29,30 @@ const formatDate = (dateStr) => {
 };
 
 // ─── Cars24 logo (dark version for light backgrounds) ─────────────────────────
-const Cars24LogoDark = () => (
+const Cars24LogoDark = ({ height = 32 }) => (
   <img
-    src={import.meta.env.BASE_URL + 'cars24-logo.svg'}
+    src={import.meta.env.BASE_URL + 'cars24-logo.png'}
     alt="Cars24"
-    style={{ height: '32px', objectFit: 'contain' }}
+    style={{ height: `${height}px`, objectFit: 'contain', display: 'block' }}
   />
 );
 
-// ─── Cars24 logo (white version for dark backgrounds) ────────────────────────
-const Cars24LogoWhite = () => (
-  <img
-    src={import.meta.env.BASE_URL + 'cars24-logo-white.svg'}
-    alt="Cars24"
-    style={{ height: '32px', objectFit: 'contain' }}
-  />
+// ─── Cars24 logo in white chip — for dark/purple backgrounds ──────────────────
+const Cars24LogoWhite = ({ height = 36 }) => (
+  <div style={{
+    background: '#FFFFFF',
+    borderRadius: 10,
+    padding: '5px 9px',
+    display: 'inline-block',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.10)',
+    lineHeight: 0,
+  }}>
+    <img
+      src={import.meta.env.BASE_URL + 'cars24-logo.png'}
+      alt="Cars24"
+      style={{ height: `${height}px`, objectFit: 'contain', display: 'block' }}
+    />
+  </div>
 );
 
 // ─── Uploaded image block ─────────────────────────────────────────────────────

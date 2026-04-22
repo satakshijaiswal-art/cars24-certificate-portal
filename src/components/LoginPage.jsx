@@ -161,11 +161,13 @@ export default function LoginPage({ onLogin }) {
       >
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: '32px', display: 'flex', justifyContent: 'center' }}>
-          <img
-            src={import.meta.env.BASE_URL + 'cars24-logo-white.svg'}
-            alt="Cars24"
-            style={{ height: '28px' }}
-          />
+          <div style={{ background: '#FFFFFF', borderRadius: 10, padding: '5px 9px', display: 'inline-block', boxShadow: '0 2px 8px rgba(0,0,0,0.10)', lineHeight: 0 }}>
+            <img
+              src={import.meta.env.BASE_URL + 'cars24-logo.png'}
+              alt="Cars24"
+              style={{ height: '28px', objectFit: 'contain', display: 'block' }}
+            />
+          </div>
         </div>
 
         {/* Title */}
