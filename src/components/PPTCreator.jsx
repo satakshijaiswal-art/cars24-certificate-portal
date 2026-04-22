@@ -930,7 +930,7 @@ function PPTCreator({ onBack }) {
                   className="slide-preview"
                   data-slide-index={1}
                   style={{
-                    backgroundImage: 'url(/assets/bg.svg)',
+                    backgroundImage: `url(${import.meta.env.BASE_URL}assets/bg.svg)`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     backgroundRepeat: 'no-repeat',
@@ -962,8 +962,8 @@ function PPTCreator({ onBack }) {
                   />
 
                   {/* Cars24 Logo - positioned at top center */}
-                  <img 
-                    src="/assets/logo.png"
+                  <img
+                    src={import.meta.env.BASE_URL + 'assets/logo.png'}
                     alt="Cars24 Logo"
                     style={{
                       position: 'absolute',
@@ -1034,7 +1034,7 @@ function PPTCreator({ onBack }) {
                           className="slide-preview"
                           data-slide-index={globalSlideIndex}
                           style={{
-                            backgroundImage: 'url(/assets/template-bg.svg)',
+                            backgroundImage: `url(${import.meta.env.BASE_URL}assets/template-bg.svg)`,
                             backgroundSize: 'cover',
                             backgroundPosition: 'center',
                             backgroundRepeat: 'no-repeat',
@@ -1331,7 +1331,7 @@ function PPTCreator({ onBack }) {
                   className="slide-preview"
                   data-slide-index={totalSlides}
                   style={{
-                    backgroundImage: 'url(/assets/bg.svg)',
+                    backgroundImage: `url(${import.meta.env.BASE_URL}assets/bg.svg)`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     backgroundRepeat: 'no-repeat',
@@ -1348,7 +1348,7 @@ function PPTCreator({ onBack }) {
                   }}
                 >
                   {/* Green Star - positioned top left */}
-                  <div 
+                  <div
                     style={{
                       position: 'absolute',
                       top: '16%',
@@ -1364,8 +1364,8 @@ function PPTCreator({ onBack }) {
                   />
 
                   {/* Cars24 Logo - positioned at top center */}
-                  <img 
-                    src="/assets/logo.png"
+                  <img
+                    src={import.meta.env.BASE_URL + 'assets/logo.png'}
                     alt="Cars24 Logo"
                     style={{
                       position: 'absolute',

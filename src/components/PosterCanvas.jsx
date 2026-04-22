@@ -28,32 +28,32 @@ const formatDate = (dateStr) => {
   return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
 };
 
-// ─── Cars24 logo (dark version for light backgrounds) ─────────────────────────
-const Cars24LogoDark = ({ height = 32 }) => (
-  <img
-    src={import.meta.env.BASE_URL + 'cars24-logo.png'}
-    alt="Cars24"
-    style={{ height: `${height}px`, objectFit: 'contain', display: 'block' }}
-  />
-);
+// ─── Shared Cars24 logo component ─────────────────────────────────────────────
+// onPurple=true  → white chip wrapper (for purple/dark backgrounds)
+// onPurple=false → direct render (for white/pale backgrounds)
+// height defaults to 32 — uniform across all poster templates
+const logoSrc = import.meta.env.BASE_URL + 'cars24-logo.png';
+const Cars24Logo = ({ onPurple = false, height = 32 }) => {
+  if (onPurple) {
+    return (
+      <div style={{
+        background: '#FFFFFF',
+        borderRadius: 10,
+        padding: '6px 10px',
+        display: 'inline-block',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+        lineHeight: 0,
+      }}>
+        <img src={logoSrc} alt="Cars24" style={{ height, display: 'block', objectFit: 'contain' }} />
+      </div>
+    );
+  }
+  return <img src={logoSrc} alt="Cars24" style={{ height, display: 'block', objectFit: 'contain' }} />;
+};
 
-// ─── Cars24 logo in white chip — for dark/purple backgrounds ──────────────────
-const Cars24LogoWhite = ({ height = 36 }) => (
-  <div style={{
-    background: '#FFFFFF',
-    borderRadius: 10,
-    padding: '5px 9px',
-    display: 'inline-block',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.10)',
-    lineHeight: 0,
-  }}>
-    <img
-      src={import.meta.env.BASE_URL + 'cars24-logo.png'}
-      alt="Cars24"
-      style={{ height: `${height}px`, objectFit: 'contain', display: 'block' }}
-    />
-  </div>
-);
+// Aliases kept for internal use — both resolve to Cars24Logo
+const Cars24LogoDark  = ({ height = 32 }) => <Cars24Logo onPurple={false} height={height} />;
+const Cars24LogoWhite = ({ height = 32 }) => <Cars24Logo onPurple={true}  height={height} />;
 
 // ─── Uploaded image block ─────────────────────────────────────────────────────
 const UploadedImageBlock = ({ src }) => {
@@ -1276,17 +1276,14 @@ const FestivalWishesCanvas = ({ template, formData }) => {
       {/* Diagonal ribbon accent — top-right corner */}
       <DiagonalRibbon accentColor={accentColor} />
 
-      {/* ── Cars24 logo — top-left, prominent ── */}
+      {/* ── Cars24 logo — top-left, uniform position ── */}
       <div style={{
         position: 'absolute',
-        top: '22px',
-        left: '30px',
+        top: '36px',
+        left: '36px',
         zIndex: 10,
-        display: 'flex',
-        alignItems: 'center',
-        gap: '6px',
       }}>
-        <Cars24LogoDark />
+        <Cars24Logo onPurple={false} height={32} />
       </div>
 
       {/* ── Editorial label strip — top-right ── */}
@@ -1599,7 +1596,7 @@ const EventAnnouncementCanvas = ({ template, formData }) => {
 
         {/* Logo row + "We're Hiring" / "You're Invited" badge */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', position: 'relative', zIndex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center' }}><Cars24LogoWhite /></div>
+          <div style={{ display: 'flex', alignItems: 'center' }}><Cars24Logo onPurple={true} height={32} /></div>
           <div style={{
             background: 'rgba(255,255,255,0.14)',
             border: '1px solid rgba(255,255,255,0.22)',
@@ -1771,7 +1768,7 @@ const EventAnnouncementCanvas = ({ template, formData }) => {
         <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '9.5px', letterSpacing: '2.5px', textTransform: 'uppercase', margin: 0, fontWeight: '600', fontFamily: FONT_SANS }}>
           {footerText}
         </p>
-        <Cars24LogoWhite />
+        <Cars24Logo onPurple={true} height={32} />
       </div>
     </div>
   );

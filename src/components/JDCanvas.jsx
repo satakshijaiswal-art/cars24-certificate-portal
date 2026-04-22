@@ -24,37 +24,30 @@ const FONT_DISPLAY = "'Playfair Display', Georgia, serif";
 const W = 595;
 const H = 842;
 
-// ─── Logo — uses official PNG from /public ────────────────────────────────────
-// invert=true → wrap in white chip (for purple backgrounds)
-// invert=false → render directly (for white/light backgrounds)
-const Logo = ({ height = 40, invert = false, style: extraStyle = {} }) => {
+// ─── Cars24 logo — uniform component matching PosterCanvas treatment ──────────
+// onPurple=true  → white chip wrapper (purple hero/sidebar/footer backgrounds)
+// onPurple=false → direct render (white/light backgrounds)
+// height defaults to 32 — uniform across all JD templates
+const _logoSrc = import.meta.env.BASE_URL + 'cars24-logo.png';
+const Logo = ({ height = 32, invert = false }) => {
   if (invert) {
     return (
-      <div style={{ display: 'inline-flex', alignItems: 'center', flexShrink: 0, ...extraStyle }}>
-        <div style={{
-          background: '#FFFFFF',
-          borderRadius: 10,
-          padding: '5px 9px',
-          display: 'inline-block',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.10)',
-          lineHeight: 0,
-        }}>
-          <img
-            src={import.meta.env.BASE_URL + 'cars24-logo.png'}
-            alt="Cars24"
-            style={{ height: `${height}px`, objectFit: 'contain', display: 'block' }}
-          />
-        </div>
+      <div style={{
+        background: '#FFFFFF',
+        borderRadius: 10,
+        padding: '6px 10px',
+        display: 'inline-block',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+        lineHeight: 0,
+        flexShrink: 0,
+      }}>
+        <img src={_logoSrc} alt="Cars24" style={{ height, display: 'block', objectFit: 'contain' }} />
       </div>
     );
   }
   return (
-    <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, ...extraStyle }}>
-      <img
-        src={import.meta.env.BASE_URL + 'cars24-logo.png'}
-        alt="Cars24"
-        style={{ height: `${height}px`, objectFit: 'contain', display: 'block' }}
-      />
+    <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+      <img src={_logoSrc} alt="Cars24" style={{ height, display: 'block', objectFit: 'contain' }} />
     </div>
   );
 };
@@ -226,7 +219,7 @@ const EditorialLayout = ({ form }) => (
 
       {/* Logo row + WE'RE HIRING badge */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', position: 'relative', zIndex: 1 }}>
-        <Logo height={40} invert />
+        <Logo height={32} invert />
         <div style={{ textAlign: 'right' }}>
           <div style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', borderRadius: '20px', padding: '4px 14px', display: 'inline-block' }}>
             <span style={{ color: '#FFFFFF', fontSize: '8px', fontWeight: '700', letterSpacing: '2.5px', textTransform: 'uppercase', fontFamily: FONT_BODY }}>We're Hiring</span>
@@ -333,7 +326,7 @@ const EditorialLayout = ({ form }) => (
             {form.recruiterName}{form.recruiterTitle ? ` · ${form.recruiterTitle}` : ''}
           </p>
         )}
-        <Logo height={26} invert />
+        <Logo height={32} invert />
       </div>
     </div>
   </div>
@@ -366,7 +359,7 @@ const MagazineLayout = ({ form }) => (
 
       {/* Logo row + JOIN CARS24 label */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '22px', position: 'relative', zIndex: 1 }}>
-        <Logo height={44} invert />
+        <Logo height={32} invert />
         <div style={{ background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '20px', padding: '4px 14px' }}>
           <span style={{ color: '#FFFFFF', fontSize: '8px', fontWeight: '700', letterSpacing: '2px', textTransform: 'uppercase', fontFamily: FONT_BODY }}>Join Cars24</span>
         </div>
@@ -481,7 +474,7 @@ const MagazineLayout = ({ form }) => (
           </p>
         )}
       </div>
-      <Logo height={28} />
+      <Logo height={32} />
     </div>
   </div>
 );
@@ -517,7 +510,7 @@ const DossierLayout = ({ form }) => (
 
       {/* Logo — centred at top */}
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '18px' }}>
-        <Logo height={38} invert />
+        <Logo height={32} invert />
       </div>
 
       {/* Vertical rule */}
@@ -663,7 +656,7 @@ const TriFoldLayout = ({ form }) => {
         flexShrink: 0,
         position: 'relative', zIndex: 2,
       }}>
-        <Logo height={38} />
+        <Logo height={32} />
         <div style={{ display: 'inline-block', border: `1.5px solid ${B.primary}`, borderRadius: '3px', padding: '3px 10px' }}>
           <span style={{ color: B.primary, fontSize: '7.5px', fontWeight: '700', letterSpacing: '2px', textTransform: 'uppercase', fontFamily: FONT_BODY }}>We're Hiring at Cars24</span>
         </div>
@@ -789,7 +782,7 @@ const TriFoldLayout = ({ form }) => {
             </p>
           )}
         </div>
-        <Logo height={26} invert />
+        <Logo height={32} invert />
       </div>
     </div>
   );
