@@ -4,7 +4,6 @@ import { jsPDF } from 'jspdf';
 import * as XLSX from 'xlsx';
 import { Download, Plus, Trash2, X, FileSpreadsheet, ArrowLeft } from 'lucide-react';
 import Header from './components/Header';
-import LoginPage from './components/LoginPage';
 import LandingPage from './components/LandingPage';
 import PPTCreator from './components/PPTCreator';
 import PosterCreator from './components/PosterCreator';
@@ -14,8 +13,9 @@ import CertificateCanvas from './components/CertificateCanvas';
 import { templates } from './data/templates';
 import './index.css';
 
+const STATIC_USER = { name: 'Cars24 Team', email: '' };
+
 function App() {
-  const [user, setUser] = useState(null);
   const [activeSection, setActiveSection] = useState(null); // null = landing, 'certificate', 'ppt', 'poster'
   const [selectedTemplate, setSelectedTemplate] = useState(templates[0]);
   const [certificates, setCertificates] = useState([]);
@@ -74,24 +74,11 @@ function App() {
     };
   }, [showDownloadPopover]);
 
-  const handleLogin = (userData) => {
-    setUser(userData);
-  };
-
-  const handleLogout = () => {
-    setUser(null);
-  };
-
-  // Show login page if not authenticated
-  if (!user) {
-    return <LoginPage onLogin={handleLogin} />;
-  }
-
   // Show landing page to choose section
   if (!activeSection) {
     return (
       <>
-        <Header user={user} onLogout={handleLogout} />
+        <Header user={STATIC_USER} />
         <div style={{ paddingTop: '60px' }}>
           <LandingPage onSelectSection={setActiveSection} />
         </div>
@@ -103,7 +90,7 @@ function App() {
   if (activeSection === 'ppt') {
     return (
       <>
-        <Header user={user} onLogout={handleLogout} />
+        <Header user={STATIC_USER} />
         <div style={{ paddingTop: '60px' }}>
           <PPTCreator onBack={() => setActiveSection(null)} />
         </div>
@@ -115,7 +102,7 @@ function App() {
   if (activeSection === 'poster') {
     return (
       <>
-        <Header user={user} onLogout={handleLogout} />
+        <Header user={STATIC_USER} />
         <div style={{ paddingTop: '60px' }}>
           <PosterCreator onBack={() => setActiveSection(null)} />
         </div>
@@ -462,7 +449,7 @@ function App() {
 
   return (
     <>
-      <Header user={user} onLogout={handleLogout} />
+      <Header user={STATIC_USER} />
       <div className="flex" style={{ backgroundColor: '#1c1c1c', padding: '48px 56px', paddingTop: '72px', gap: '24px', minHeight: '100vh' }}>
       {/* Left Sidebar - Templates */}
       <TemplateSidebar

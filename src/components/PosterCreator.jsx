@@ -12,7 +12,7 @@ const defaultFestivalForm = (template) => ({
   subheadline: '',
   recipientName: '',
   message: template?.defaultMessage || '',
-  footerText: 'Cars24 People Team',
+  footerText: 'With warm wishes from Team Cars24',
   fromName: '',
   fromTitle: '',
   // image upload
@@ -61,7 +61,8 @@ function TemplateThumbnail({ template, selected, onClick, mode }) {
       <div style={{
         width: '100%',
         height: '90px',
-        background: template.gradient,
+        background: template.posterBg || template.gradient || '#4A35FE',
+        backgroundSize: 'cover',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -76,6 +77,8 @@ function TemplateThumbnail({ template, selected, onClick, mode }) {
           padding: '0 8px',
           textShadow: '0 1px 4px rgba(0,0,0,0.5)',
           lineHeight: '1.3',
+          background: 'rgba(0,0,0,0.2)',
+          borderRadius: '4px',
         }}>
           {mode === 'festival' ? template.headline : template.defaultTitle}
         </span>
