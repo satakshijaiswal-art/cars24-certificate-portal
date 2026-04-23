@@ -8,6 +8,7 @@ import LandingPage from './components/LandingPage';
 import PPTCreator from './components/PPTCreator';
 import PosterCreator from './components/PosterCreator';
 import JDCreator from './components/JDCreator';
+import VideoCreator from './components/VideoCreator';
 import TemplateSidebar from './components/TemplateSidebar';
 import EditPanel from './components/EditPanel';
 import CertificateCanvas from './components/CertificateCanvas';
@@ -118,6 +119,18 @@ function App() {
         <Header user={STATIC_USER} />
         <div style={{ paddingTop: '60px' }}>
           <JDCreator onBack={() => setActiveSection(null)} />
+        </div>
+      </>
+    );
+  }
+
+  // Show Video Templates
+  if (activeSection === 'video') {
+    return (
+      <>
+        <Header user={STATIC_USER} />
+        <div style={{ paddingTop: '60px' }}>
+          <VideoCreator onBack={() => setActiveSection(null)} />
         </div>
       </>
     );
