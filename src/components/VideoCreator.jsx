@@ -1,29 +1,55 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { ArrowLeft, Download, Play, Square, Video } from 'lucide-react';
+import { ArrowLeft, Download, Play, Square, Video, Music, VolumeX } from 'lucide-react';
 
-// Brand tokens matching the rest of the portal
+// ─── Brand tokens — exact match to CertificateCanvas / templates.js ───────────
+// Primary: #4736FE  (Cars24 indigo-purple — same as accentColor/borderColor in cert tab)
+// Dark navy: #2B3990 (same as signatory color in BarRaiserLayout)
+// Body text: #1C1C1C (same as holderName color in BarRaiserLayout)
+// Background UI: #1c1c1c dark canvas, #252525 surface (unchanged — these are UI chrome,
+//   not cert content colors)
 const BRAND = {
   primary: '#4736FE',
-  primaryDark: '#3a2bd4',
+  primaryDark: '#2B3990',
   bg: '#1c1c1c',
   surface: '#252525',
   border: 'rgba(255,255,255,0.06)',
   text: '#FFFFFF',
   textMuted: 'rgba(255,255,255,0.5)',
-  accent: '#00FFAA',
+  // Gold accent used on certs for signatory; used as highlight in video too
+  gold: '#FFD700',
+  // Cert body text color
+  bodyText: '#1C1C1C',
 };
 
 const VIDEO_W = 1280;
 const VIDEO_H = 720;
 const DURATION_MS = 6000; // 6 seconds per video
 
-// ─── template definitions ────────────────────────────────────────────────────
+// ─── Music moods ──────────────────────────────────────────────────────────────
+// WAV files generated in public/audio/ — 8s synthetic tones, 100% royalty-free.
+// "Upbeat" and "Celebration" suit Birthday/Anniversary/Award/Welcome.
+// "Gentle" suits Farewell.
+const MUSIC_MOODS = [
+  { id: 'upbeat',      label: 'Upbeat',      file: 'upbeat.wav',      defaultFor: ['birthday','anniversary','welcome'] },
+  { id: 'celebration', label: 'Celebration', file: 'celebration.wav', defaultFor: ['award'] },
+  { id: 'gentle',      label: 'Gentle',      file: 'gentle.wav',      defaultFor: ['farewell'] },
+];
+
+function getMoodForTemplate(templateId) {
+  for (const mood of MUSIC_MOODS) {
+    if (mood.defaultFor.includes(templateId)) return mood;
+  }
+  return MUSIC_MOODS[0];
+}
+
+// ─── template definitions ─────────────────────────────────────────────────────
 const VIDEO_TEMPLATES = [
   {
     id: 'birthday',
     label: 'Birthday Wish',
     description: 'Festive animation for employee birthdays',
-    gradient: ['#FF6B6B', '#FF8E53', '#FF6B6B'],
+    // Warm reds blend into the Cars24 primary at the dark end
+    gradient: ['#c0392b', '#4736FE', '#c0392b'],
     emoji: '🎂',
     fields: [
       { key: 'name', label: 'Employee Name', placeholder: 'Priya Sharma' },
@@ -35,7 +61,8 @@ const VIDEO_TEMPLATES = [
     id: 'anniversary',
     label: 'Work Anniversary',
     description: 'Celebrate milestone years with the team',
-    gradient: ['#4736FE', '#8B5CF6', '#4736FE'],
+    // Deep indigo — centred on Cars24 primary
+    gradient: ['#0f0a2e', '#4736FE', '#0f0a2e'],
     emoji: '🏆',
     fields: [
       { key: 'name', label: 'Employee Name', placeholder: 'Rahul Mehta' },
@@ -48,7 +75,8 @@ const VIDEO_TEMPLATES = [
     id: 'welcome',
     label: 'New Joiner Welcome',
     description: 'Warm welcome for new team members',
-    gradient: ['#00C9A7', '#4736FE', '#00C9A7'],
+    // Dark navy to Cars24 primary
+    gradient: ['#0d0829', '#2B3990', '#0d0829'],
     emoji: '👋',
     fields: [
       { key: 'name', label: 'Employee Name', placeholder: 'Ananya Singh' },
@@ -61,7 +89,8 @@ const VIDEO_TEMPLATES = [
     id: 'award',
     label: 'Award & Recognition',
     description: 'Recognise outstanding performance',
-    gradient: ['#FFD700', '#FF6B35', '#FFD700'],
+    // Dark navy + gold (cert signatory is gold #FFD700, accentColor #4736FE)
+    gradient: ['#0d0829', '#4736FE', '#0d0829'],
     emoji: '⭐',
     fields: [
       { key: 'name', label: 'Employee Name', placeholder: 'Vikram Nair' },
@@ -74,7 +103,8 @@ const VIDEO_TEMPLATES = [
     id: 'farewell',
     label: 'Farewell',
     description: 'Send off a colleague with warmth',
-    gradient: ['#667EEA', '#764BA2', '#667EEA'],
+    // Deeper purple-navy for a softer, reflective feel
+    gradient: ['#0d0829', '#2B3990', '#0d0829'],
     emoji: '💫',
     fields: [
       { key: 'name', label: 'Employee Name', placeholder: 'Deepak Patel' },
@@ -84,7 +114,7 @@ const VIDEO_TEMPLATES = [
   },
 ];
 
-// ─── canvas draw functions ────────────────────────────────────────────────────
+// ─── canvas helpers ───────────────────────────────────────────────────────────
 
 function lerp(a, b, t) { return a + (b - a) * t; }
 function easeInOut(t) { return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t; }
@@ -127,28 +157,48 @@ function drawParticles(ctx, t, color1, color2) {
   }
 }
 
-function drawCars24Logo(ctx, x, y, size) {
-  // Simple text-based Cars24 logo mark
+// ─── Logo loader (singleton promise, cached after first load) ─────────────────
+let _logoImg = null;
+let _logoPromise = null;
+
+function getLogoImage(baseUrl) {
+  if (_logoImg) return Promise.resolve(_logoImg);
+  if (_logoPromise) return _logoPromise;
+  _logoPromise = new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => { _logoImg = img; resolve(img); };
+    img.onerror = () => resolve(null); // graceful fallback
+    img.src = (baseUrl || '/') + 'cars24-logo.png';
+  });
+  return _logoPromise;
+}
+
+// Global ref so draw functions can access the loaded image synchronously
+let _cachedLogo = null;
+
+// Draw logo image in top-left; fallback to a text "Cars24" if image not loaded
+function drawLogoTopLeft(ctx, baseUrl) {
   ctx.save();
-  const boxSize = size;
-  const radius = boxSize * 0.18;
-  const grd = ctx.createLinearGradient(x, y, x + boxSize, y + boxSize);
-  grd.addColorStop(0, '#4736FE');
-  grd.addColorStop(1, '#8B5CF6');
-  ctx.beginPath();
-  ctx.roundRect(x, y, boxSize, boxSize, radius);
-  ctx.fillStyle = grd;
-  ctx.fill();
-  ctx.fillStyle = '#FFFFFF';
-  ctx.font = `bold ${boxSize * 0.5}px Inter, system-ui, sans-serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('C', x + boxSize / 2, y + boxSize / 2);
+  if (_cachedLogo) {
+    // Logo is 1669×389 — draw at ~12% of canvas width, vertically proportional
+    const logoW = Math.round(VIDEO_W * 0.12); // ~154px
+    const logoH = Math.round(logoW * (389 / 1669));
+    const x = 32;
+    const y = 28;
+    ctx.drawImage(_cachedLogo, x, y, logoW, logoH);
+  } else {
+    // Text fallback until image loads
+    ctx.font = 'bold 22px Inter, system-ui, sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.fillText('Cars24', 32, 28);
+  }
   ctx.restore();
 }
 
 function drawBg(ctx, gradColors, t) {
-  // Animated gradient background
   const phase = (Math.sin(t * Math.PI * 2) + 1) / 2;
   const grd = ctx.createLinearGradient(0, 0, VIDEO_W, VIDEO_H);
   grd.addColorStop(0, gradColors[0]);
@@ -156,33 +206,20 @@ function drawBg(ctx, gradColors, t) {
   grd.addColorStop(1, gradColors[2]);
   ctx.fillStyle = grd;
   ctx.fillRect(0, 0, VIDEO_W, VIDEO_H);
-
-  // Dark overlay for readability
   ctx.fillStyle = 'rgba(0,0,0,0.45)';
   ctx.fillRect(0, 0, VIDEO_W, VIDEO_H);
 }
 
-function drawCars24Tag(ctx) {
-  ctx.save();
-  ctx.font = 'bold 22px Inter, system-ui, sans-serif';
-  ctx.textAlign = 'right';
-  ctx.textBaseline = 'bottom';
-  ctx.fillStyle = 'rgba(255,255,255,0.7)';
-  ctx.fillText('Cars24', VIDEO_W - 32, VIDEO_H - 28);
-  ctx.restore();
-}
-
-// ─── Birthday ─────────────────────────────────────────────────────────────────
+// ─── Birthday ──────────────────────────────────────────────────────────────────
 function drawBirthday(ctx, fields, t, progress) {
   const { name = '', message = '' } = fields;
-  drawBg(ctx, ['#FF6B6B', '#FF8E53', '#c0392b'], t);
+  drawBg(ctx, ['#c0392b', '#4736FE', '#c0392b'], t);
   drawStars(ctx, t, 40, null);
-  drawParticles(ctx, t, 'rgba(255,200,100', 'rgba(255,100,100');
+  drawParticles(ctx, t, 'rgba(255,200,100', 'rgba(71,54,254');
 
   const fadeIn = easeOut(Math.min(progress * 3, 1));
   const nameSlide = easeOut(Math.min(Math.max(progress * 3 - 0.5, 0), 1));
 
-  // Emoji
   ctx.save();
   ctx.font = `${lerp(60, 90, easeInOut(Math.sin(t * Math.PI * 2) * 0.5 + 0.5))}px serif`;
   ctx.textAlign = 'center';
@@ -191,7 +228,6 @@ function drawBirthday(ctx, fields, t, progress) {
   ctx.fillText('🎂', VIDEO_W / 2, VIDEO_H * 0.22);
   ctx.restore();
 
-  // "Happy Birthday"
   ctx.save();
   ctx.globalAlpha = fadeIn;
   ctx.font = 'bold 56px Inter, system-ui, sans-serif';
@@ -201,12 +237,11 @@ function drawBirthday(ctx, fields, t, progress) {
   ctx.fillText('Happy Birthday!', VIDEO_W / 2, VIDEO_H * 0.42);
   ctx.restore();
 
-  // Name
   if (name) {
     ctx.save();
     ctx.globalAlpha = nameSlide;
     ctx.font = 'bold 72px Inter, system-ui, sans-serif';
-    ctx.fillStyle = '#FFD700';
+    ctx.fillStyle = '#FFD700'; // gold accent — same as cert signatory highlight
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.shadowColor = 'rgba(255,215,0,0.5)';
@@ -215,7 +250,6 @@ function drawBirthday(ctx, fields, t, progress) {
     ctx.restore();
   }
 
-  // Message
   if (message) {
     ctx.save();
     ctx.globalAlpha = Math.min(Math.max(progress * 3 - 1.2, 0), 1);
@@ -226,20 +260,19 @@ function drawBirthday(ctx, fields, t, progress) {
     ctx.restore();
   }
 
-  drawCars24Tag(ctx);
+  drawLogoTopLeft(ctx);
 }
 
-// ─── Anniversary ──────────────────────────────────────────────────────────────
+// ─── Anniversary ───────────────────────────────────────────────────────────────
 function drawAnniversary(ctx, fields, t, progress) {
   const { name = '', years = '', message = '' } = fields;
-  drawBg(ctx, ['#1a0533', '#4736FE', '#1a0533'], t);
+  drawBg(ctx, ['#0f0a2e', '#4736FE', '#0f0a2e'], t);
   drawStars(ctx, t, 60, 'rgba(200,180,255,0.7)');
 
   const fadeIn = easeOut(Math.min(progress * 3, 1));
   const yearsSlide = easeOut(Math.min(Math.max(progress * 3 - 0.3, 0), 1));
   const nameSlide = easeOut(Math.min(Math.max(progress * 3 - 0.8, 0), 1));
 
-  // Milestone ring
   if (years) {
     ctx.save();
     ctx.globalAlpha = yearsSlide;
@@ -247,13 +280,13 @@ function drawAnniversary(ctx, fields, t, progress) {
     const cy = VIDEO_H * 0.3;
     const radius = 70;
     const grad = ctx.createRadialGradient(cx, cy, 10, cx, cy, radius);
-    grad.addColorStop(0, '#8B5CF6');
-    grad.addColorStop(1, '#4736FE');
+    grad.addColorStop(0, '#4736FE');
+    grad.addColorStop(1, '#2B3990');
     ctx.beginPath();
     ctx.arc(cx, cy, radius, 0, Math.PI * 2);
     ctx.fillStyle = grad;
     ctx.fill();
-    ctx.strokeStyle = '#00FFAA';
+    ctx.strokeStyle = '#FFD700'; // gold ring — mirrors cert gold accent
     ctx.lineWidth = 4;
     ctx.stroke();
     ctx.font = 'bold 52px Inter, system-ui, sans-serif';
@@ -267,7 +300,6 @@ function drawAnniversary(ctx, fields, t, progress) {
     ctx.restore();
   }
 
-  // Headline
   ctx.save();
   ctx.globalAlpha = fadeIn;
   ctx.font = 'bold 48px Inter, system-ui, sans-serif';
@@ -277,21 +309,19 @@ function drawAnniversary(ctx, fields, t, progress) {
   ctx.fillText('Work Anniversary', VIDEO_W / 2, VIDEO_H * 0.52);
   ctx.restore();
 
-  // Name
   if (name) {
     ctx.save();
     ctx.globalAlpha = nameSlide;
     ctx.font = 'bold 64px Inter, system-ui, sans-serif';
-    ctx.fillStyle = '#00FFAA';
+    ctx.fillStyle = '#FFD700';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.shadowColor = 'rgba(0,255,170,0.4)';
+    ctx.shadowColor = 'rgba(255,215,0,0.4)';
     ctx.shadowBlur = 20;
     ctx.fillText(name, VIDEO_W / 2, VIDEO_H * 0.65);
     ctx.restore();
   }
 
-  // Message
   if (message) {
     ctx.save();
     ctx.globalAlpha = Math.min(Math.max(progress * 3 - 1.4, 0), 1);
@@ -302,20 +332,19 @@ function drawAnniversary(ctx, fields, t, progress) {
     ctx.restore();
   }
 
-  drawCars24Tag(ctx);
+  drawLogoTopLeft(ctx);
 }
 
-// ─── Welcome ──────────────────────────────────────────────────────────────────
+// ─── Welcome ───────────────────────────────────────────────────────────────────
 function drawWelcome(ctx, fields, t, progress) {
   const { name = '', role = '', team = '' } = fields;
-  drawBg(ctx, ['#004d3d', '#00C9A7', '#004d3d'], t);
-  drawStars(ctx, t, 30, 'rgba(0,255,170,0.5)');
+  drawBg(ctx, ['#0d0829', '#2B3990', '#0d0829'], t);
+  drawStars(ctx, t, 30, 'rgba(180,170,255,0.5)');
 
   const fadeIn = easeOut(Math.min(progress * 3, 1));
   const nameSlide = easeOut(Math.min(Math.max(progress * 3 - 0.5, 0), 1));
   const roleSlide = easeOut(Math.min(Math.max(progress * 3 - 0.9, 0), 1));
 
-  // Wave emoji
   ctx.save();
   ctx.globalAlpha = fadeIn;
   const wave = 1 + 0.15 * Math.sin(t * Math.PI * 4);
@@ -324,7 +353,6 @@ function drawWelcome(ctx, fields, t, progress) {
   ctx.fillText('👋', VIDEO_W / 2, VIDEO_H * 0.22);
   ctx.restore();
 
-  // Welcome headline
   ctx.save();
   ctx.globalAlpha = fadeIn;
   ctx.font = 'bold 52px Inter, system-ui, sans-serif';
@@ -334,21 +362,19 @@ function drawWelcome(ctx, fields, t, progress) {
   ctx.fillText('Welcome to the team!', VIDEO_W / 2, VIDEO_H * 0.4);
   ctx.restore();
 
-  // Name
   if (name) {
     ctx.save();
     ctx.globalAlpha = nameSlide;
     ctx.font = 'bold 70px Inter, system-ui, sans-serif';
-    ctx.fillStyle = '#00FFD4';
+    ctx.fillStyle = '#FFD700';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.shadowColor = 'rgba(0,255,212,0.5)';
+    ctx.shadowColor = 'rgba(255,215,0,0.4)';
     ctx.shadowBlur = 24;
     ctx.fillText(name, VIDEO_W / 2, VIDEO_H * 0.54);
     ctx.restore();
   }
 
-  // Role + Team pill
   if (role || team) {
     ctx.save();
     ctx.globalAlpha = roleSlide;
@@ -361,9 +387,9 @@ function drawWelcome(ctx, fields, t, progress) {
     const pillY = VIDEO_H * 0.67 - pillH / 2;
     ctx.beginPath();
     ctx.roundRect(pillX, pillY, pillW, pillH, 26);
-    ctx.fillStyle = 'rgba(0,255,170,0.2)';
+    ctx.fillStyle = 'rgba(71,54,254,0.3)';
     ctx.fill();
-    ctx.strokeStyle = '#00FFAA';
+    ctx.strokeStyle = '#4736FE';
     ctx.lineWidth = 2;
     ctx.stroke();
     ctx.fillStyle = '#FFFFFF';
@@ -373,7 +399,6 @@ function drawWelcome(ctx, fields, t, progress) {
     ctx.restore();
   }
 
-  // Cars24 team note
   ctx.save();
   ctx.globalAlpha = Math.min(Math.max(progress * 3 - 1.6, 0), 1);
   ctx.font = '24px Inter, system-ui, sans-serif';
@@ -383,20 +408,19 @@ function drawWelcome(ctx, fields, t, progress) {
   ctx.fillText('We\'re thrilled to have you at Cars24!', VIDEO_W / 2, VIDEO_H * 0.81);
   ctx.restore();
 
-  drawCars24Tag(ctx);
+  drawLogoTopLeft(ctx);
 }
 
-// ─── Award ────────────────────────────────────────────────────────────────────
+// ─── Award ─────────────────────────────────────────────────────────────────────
 function drawAward(ctx, fields, t, progress) {
   const { name = '', award = '', reason = '' } = fields;
-  drawBg(ctx, ['#3d2500', '#FF6B35', '#3d2500'], t);
+  drawBg(ctx, ['#0d0829', '#4736FE', '#0d0829'], t);
   drawStars(ctx, t, 50, 'rgba(255,215,0,0.6)');
 
   const fadeIn = easeOut(Math.min(progress * 3, 1));
   const nameSlide = easeOut(Math.min(Math.max(progress * 3 - 0.6, 0), 1));
   const reasonSlide = easeOut(Math.min(Math.max(progress * 3 - 1.1, 0), 1));
 
-  // Star burst
   ctx.save();
   ctx.globalAlpha = fadeIn;
   const pulse = 1 + 0.08 * Math.sin(t * Math.PI * 3);
@@ -405,7 +429,6 @@ function drawAward(ctx, fields, t, progress) {
   ctx.fillText('⭐', VIDEO_W / 2, VIDEO_H * 0.2);
   ctx.restore();
 
-  // Award title
   if (award) {
     ctx.save();
     ctx.globalAlpha = fadeIn;
@@ -419,7 +442,6 @@ function drawAward(ctx, fields, t, progress) {
     ctx.restore();
   }
 
-  // Name
   if (name) {
     ctx.save();
     ctx.globalAlpha = nameSlide;
@@ -431,7 +453,6 @@ function drawAward(ctx, fields, t, progress) {
     ctx.restore();
   }
 
-  // Reason
   if (reason) {
     ctx.save();
     ctx.globalAlpha = reasonSlide;
@@ -442,20 +463,19 @@ function drawAward(ctx, fields, t, progress) {
     ctx.restore();
   }
 
-  drawCars24Tag(ctx);
+  drawLogoTopLeft(ctx);
 }
 
-// ─── Farewell ─────────────────────────────────────────────────────────────────
+// ─── Farewell ──────────────────────────────────────────────────────────────────
 function drawFarewell(ctx, fields, t, progress) {
   const { name = '', message = '' } = fields;
-  drawBg(ctx, ['#1a1040', '#667EEA', '#1a1040'], t);
+  drawBg(ctx, ['#0d0829', '#2B3990', '#0d0829'], t);
   drawStars(ctx, t, 70, null);
 
   const fadeIn = easeOut(Math.min(progress * 3, 1));
   const nameSlide = easeOut(Math.min(Math.max(progress * 3 - 0.6, 0), 1));
   const msgSlide = easeOut(Math.min(Math.max(progress * 3 - 1.1, 0), 1));
 
-  // Sparkle
   ctx.save();
   ctx.globalAlpha = fadeIn;
   const drift = Math.sin(t * Math.PI * 2) * 10;
@@ -464,7 +484,6 @@ function drawFarewell(ctx, fields, t, progress) {
   ctx.fillText('💫', VIDEO_W / 2 + drift, VIDEO_H * 0.2);
   ctx.restore();
 
-  // Headline
   ctx.save();
   ctx.globalAlpha = fadeIn;
   ctx.font = 'bold 56px Inter, system-ui, sans-serif';
@@ -475,12 +494,11 @@ function drawFarewell(ctx, fields, t, progress) {
   ctx.fillText('Best Wishes', VIDEO_W / 2, VIDEO_H * 0.46);
   ctx.restore();
 
-  // Name
   if (name) {
     ctx.save();
     ctx.globalAlpha = nameSlide;
     ctx.font = 'bold 68px Inter, system-ui, sans-serif';
-    ctx.fillStyle = '#C4B5FD';
+    ctx.fillStyle = '#C4B5FD'; // lavender — softer for farewell, still in the purple family
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.shadowColor = 'rgba(196,181,253,0.5)';
@@ -489,7 +507,6 @@ function drawFarewell(ctx, fields, t, progress) {
     ctx.restore();
   }
 
-  // Message
   if (message) {
     ctx.save();
     ctx.globalAlpha = msgSlide;
@@ -500,14 +517,13 @@ function drawFarewell(ctx, fields, t, progress) {
     ctx.restore();
   }
 
-  drawCars24Tag(ctx);
+  drawLogoTopLeft(ctx);
 }
 
-// ─── text wrap utility ────────────────────────────────────────────────────────
+// ─── text wrap utility ─────────────────────────────────────────────────────────
 function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
   const words = text.split(' ');
   let line = '';
-  let currentY = y;
   const lines = [];
 
   for (const word of words) {
@@ -522,14 +538,14 @@ function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
   if (line) lines.push(line);
 
   const totalH = (lines.length - 1) * lineHeight;
-  currentY = y - totalH / 2;
+  let currentY = y - totalH / 2;
   for (const l of lines) {
     ctx.fillText(l, x, currentY);
     currentY += lineHeight;
   }
 }
 
-// ─── VideoCreator component ───────────────────────────────────────────────────
+// ─── VideoCreator component ────────────────────────────────────────────────────
 function VideoCreator({ onBack }) {
   const [selectedTemplate, setSelectedTemplate] = useState(VIDEO_TEMPLATES[0]);
   const [fields, setFields] = useState({});
@@ -540,13 +556,22 @@ function VideoCreator({ onBack }) {
   const [recordingProgress, setRecordingProgress] = useState(0);
   const [supportNote, setSupportNote] = useState('');
 
+  // Music state
+  const [musicEnabled, setMusicEnabled] = useState(true);
+  const [selectedMood, setSelectedMood] = useState(() => getMoodForTemplate(VIDEO_TEMPLATES[0].id));
+
   const canvasRef = useRef(null);
   const animFrameRef = useRef(null);
   const recorderRef = useRef(null);
   const chunksRef = useRef([]);
   const startTimeRef = useRef(null);
   const previewStartRef = useRef(null);
-  const isPreviewRef = useRef(false);
+
+  // Audio refs
+  const audioElRef = useRef(null);       // <audio> element
+  const audioCtxRef = useRef(null);      // AudioContext
+  const gainNodeRef = useRef(null);      // GainNode for fade in/out
+  const mediaDestRef = useRef(null);     // MediaStreamDestinationNode
 
   // Detect codec support once on mount
   useEffect(() => {
@@ -557,11 +582,28 @@ function VideoCreator({ onBack }) {
     if (!mp4 && !webm) {
       setSupportNote('Your browser does not support video recording. Please use Chrome, Edge, or Firefox.');
     } else if (!mp4) {
-      setSupportNote('Downloading as .webm (fully supported in Chrome/Firefox). Safari plays webm via VLC or ffmpeg.');
+      setSupportNote('Downloading as .webm (Chrome/Firefox). Safari users can convert via VLC or ffmpeg.');
     }
   }, []);
 
-  // Pick best supported MIME type
+  // Pre-load the Cars24 logo image so draw functions have it synchronously
+  useEffect(() => {
+    const baseUrl = import.meta.env.BASE_URL || '/';
+    getLogoImage(baseUrl).then((img) => {
+      _cachedLogo = img;
+      // Re-draw the static first frame now that the logo is loaded
+      if (!isRecording && !isPreviewPlaying && canvasRef.current) {
+        const ctx = canvasRef.current.getContext('2d');
+        selectedTemplate.draw(ctx, fields, 0, 0.2);
+      }
+    });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Update default mood when template changes
+  useEffect(() => {
+    setSelectedMood(getMoodForTemplate(selectedTemplate.id));
+  }, [selectedTemplate]);
+
   function getBestMime() {
     const candidates = [
       'video/mp4;codecs=avc1',
@@ -576,8 +618,105 @@ function VideoCreator({ onBack }) {
   }
 
   function getExtension(mime) {
-    if (mime.startsWith('video/mp4')) return 'mp4';
-    return 'webm';
+    return mime.startsWith('video/mp4') ? 'mp4' : 'webm';
+  }
+
+  // Set up (or re-use) AudioContext + destination node.
+  // Returns { gainNode, mediaDestNode } or null if audio is disabled.
+  function setupAudio() {
+    if (!musicEnabled) return null;
+
+    try {
+      // Create AudioContext on first use (or reuse existing one)
+      if (!audioCtxRef.current || audioCtxRef.current.state === 'closed') {
+        audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      const ctx = audioCtxRef.current;
+
+      // Resume if suspended (browser autoplay policy)
+      if (ctx.state === 'suspended') ctx.resume();
+
+      // Create gain node for volume / fade control
+      const gain = ctx.createGain();
+      gain.gain.value = 0; // start silent, fade in
+      gain.connect(ctx.destination);
+      gainNodeRef.current = gain;
+
+      // MediaStreamDestination — its stream will be mixed into the MediaRecorder
+      const dest = ctx.createMediaStreamDestination();
+      gainNodeRef.current.connect(dest);
+      mediaDestRef.current = dest;
+
+      return { gainNode: gain, mediaDestNode: dest };
+    } catch (err) {
+      console.warn('AudioContext setup failed:', err);
+      return null;
+    }
+  }
+
+  // Start the <audio> element and wire it through AudioContext
+  function startAudio(audioNodes) {
+    if (!audioNodes) return;
+    const { gainNode } = audioNodes;
+    const ctx = audioCtxRef.current;
+
+    try {
+      // Create / re-use <audio> element
+      let audioEl = audioElRef.current;
+      if (!audioEl) {
+        audioEl = document.createElement('audio');
+        audioEl.loop = true;
+        audioEl.crossOrigin = 'anonymous';
+        audioElRef.current = audioEl;
+      }
+      const baseUrl = import.meta.env.BASE_URL || '/';
+      const newSrc = baseUrl + 'audio/' + selectedMood.file;
+      if (audioEl.src !== new URL(newSrc, window.location.href).href) {
+        audioEl.src = newSrc;
+      }
+
+      // Connect to AudioContext if not already connected
+      // (createMediaElementSource can only be called once per element)
+      if (!audioEl._sourceNode) {
+        const sourceNode = ctx.createMediaElementSource(audioEl);
+        audioEl._sourceNode = sourceNode;
+      }
+      // Reconnect source to current gain node each time
+      audioEl._sourceNode.disconnect();
+      audioEl._sourceNode.connect(gainNode);
+
+      // Play
+      audioEl.currentTime = 0;
+      audioEl.volume = 1; // volume is controlled via GainNode
+      const playPromise = audioEl.play();
+      if (playPromise) playPromise.catch(() => {});
+
+      // Fade in over 0.8s, fade out at the tail
+      const durationSec = DURATION_MS / 1000;
+      gainNode.gain.cancelScheduledValues(ctx.currentTime);
+      gainNode.gain.setValueAtTime(0, ctx.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0.55, ctx.currentTime + 0.8); // fade in to 55% volume
+      gainNode.gain.setValueAtTime(0.55, ctx.currentTime + durationSec - 0.8);
+      gainNode.gain.linearRampToValueAtTime(0, ctx.currentTime + durationSec); // fade out
+    } catch (err) {
+      console.warn('Audio start failed:', err);
+    }
+  }
+
+  function stopAudio() {
+    try {
+      const audioEl = audioElRef.current;
+      if (audioEl) {
+        audioEl.pause();
+        audioEl.currentTime = 0;
+      }
+      if (gainNodeRef.current && audioCtxRef.current) {
+        gainNodeRef.current.gain.cancelScheduledValues(audioCtxRef.current.currentTime);
+        gainNodeRef.current.gain.setValueAtTime(0, audioCtxRef.current.currentTime);
+      }
+    } catch (err) {
+      console.warn('Audio stop failed:', err);
+    }
   }
 
   // Main animation loop
@@ -593,9 +732,8 @@ function VideoCreator({ onBack }) {
     }
     const elapsed = timestamp - (isRecordingRun ? startTimeRef.current : previewStartRef.current);
     const progress = Math.min(elapsed / DURATION_MS, 1);
-    const t = elapsed / 1000; // seconds
+    const t = elapsed / 1000;
 
-    // Draw the frame
     selectedTemplate.draw(ctx, fields, t, progress);
 
     if (isRecordingRun) {
@@ -605,37 +743,37 @@ function VideoCreator({ onBack }) {
     if (progress < 1) {
       animFrameRef.current = requestAnimationFrame((ts) => animate(ts, isRecordingRun));
     } else {
-      // Animation finished
+      stopAudio();
       if (isRecordingRun) {
         recorderRef.current?.stop();
         setIsRecording(false);
         setRecordingProgress(100);
       } else {
         setIsPreviewPlaying(false);
-        isPreviewRef.current = false;
       }
     }
-  }, [selectedTemplate, fields]);
+  }, [selectedTemplate, fields]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Preview
   const startPreview = useCallback(() => {
     if (isRecording) return;
     cancelAnimationFrame(animFrameRef.current);
     previewStartRef.current = null;
-    isPreviewRef.current = true;
     setIsPreviewPlaying(true);
+
+    const audioNodes = setupAudio();
+
     animFrameRef.current = requestAnimationFrame((ts) => {
       previewStartRef.current = ts;
+      startAudio(audioNodes);
       animate(ts, false);
     });
-  }, [animate, isRecording]);
+  }, [animate, isRecording, musicEnabled, selectedMood]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Stop preview
   const stopPreview = useCallback(() => {
     cancelAnimationFrame(animFrameRef.current);
+    stopAudio();
     setIsPreviewPlaying(false);
-    isPreviewRef.current = false;
-    // Draw static first frame
     const canvas = canvasRef.current;
     if (canvas) {
       const ctx = canvas.getContext('2d');
@@ -643,18 +781,37 @@ function VideoCreator({ onBack }) {
     }
   }, [selectedTemplate, fields]);
 
-  // Record + download
+  // Record + download — combine canvas video track + audio track into MediaRecorder
   const startRecording = useCallback(() => {
     if (!canvasRef.current) return;
     cancelAnimationFrame(animFrameRef.current);
     setIsPreviewPlaying(false);
+    stopAudio();
     setDownloadUrl(null);
     chunksRef.current = [];
 
     const mime = getBestMime();
     const ext = getExtension(mime);
-    const stream = canvasRef.current.captureStream(30);
-    const recorder = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 4000000 });
+
+    // Build combined stream: canvas video track + optional audio track
+    const videoStream = canvasRef.current.captureStream(30);
+    let combinedStream = videoStream;
+
+    const audioNodes = musicEnabled ? setupAudio() : null;
+
+    if (audioNodes && audioNodes.mediaDestNode) {
+      // Add audio tracks from the MediaStreamDestination to the combined stream
+      const audioTracks = audioNodes.mediaDestNode.stream.getAudioTracks();
+      if (audioTracks.length > 0) {
+        const tracks = [
+          ...videoStream.getVideoTracks(),
+          ...audioTracks,
+        ];
+        combinedStream = new MediaStream(tracks);
+      }
+    }
+
+    const recorder = new MediaRecorder(combinedStream, { mimeType: mime, videoBitsPerSecond: 4000000 });
 
     recorder.ondataavailable = (e) => {
       if (e.data && e.data.size > 0) chunksRef.current.push(e.data);
@@ -673,16 +830,16 @@ function VideoCreator({ onBack }) {
 
     recorder.start(100);
     recorderRef.current = recorder;
-
     startTimeRef.current = null;
     setIsRecording(true);
     setRecordingProgress(0);
 
     animFrameRef.current = requestAnimationFrame((ts) => {
       startTimeRef.current = ts;
+      startAudio(audioNodes);
       animate(ts, true);
     });
-  }, [animate, selectedTemplate, fields]);
+  }, [animate, selectedTemplate, fields, musicEnabled, selectedMood]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Draw static frame when template/fields change (not during recording)
   useEffect(() => {
@@ -698,14 +855,18 @@ function VideoCreator({ onBack }) {
     setFields({});
     setDownloadUrl(null);
     cancelAnimationFrame(animFrameRef.current);
+    stopAudio();
     setIsPreviewPlaying(false);
     setIsRecording(false);
-  }, [selectedTemplate]);
+  }, [selectedTemplate]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Cleanup on unmount
   useEffect(() => {
-    return () => cancelAnimationFrame(animFrameRef.current);
-  }, []);
+    return () => {
+      cancelAnimationFrame(animFrameRef.current);
+      stopAudio();
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleFieldChange = (key, value) => {
     setFields(prev => ({ ...prev, [key]: value }));
@@ -713,7 +874,7 @@ function VideoCreator({ onBack }) {
 
   const canRecord = typeof MediaRecorder !== 'undefined';
 
-  // ─── render ─────────────────────────────────────────────────────────────────
+  // ─── render ──────────────────────────────────────────────────────────────────
   return (
     <div style={{ backgroundColor: BRAND.bg, minHeight: '100vh', padding: '24px 32px' }}>
       {/* Page header */}
@@ -748,9 +909,10 @@ function VideoCreator({ onBack }) {
       </div>
 
       <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
-        {/* Left: template picker + form */}
+        {/* Left panel */}
         <div style={{ flex: '0 0 340px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          {/* Template cards */}
+
+          {/* Template picker */}
           <div
             style={{
               backgroundColor: BRAND.surface,
@@ -842,6 +1004,7 @@ function VideoCreator({ onBack }) {
                         resize: 'vertical',
                         fontFamily: 'Inter, system-ui, sans-serif',
                         outline: 'none',
+                        boxSizing: 'border-box',
                       }}
                     />
                   ) : (
@@ -860,6 +1023,7 @@ function VideoCreator({ onBack }) {
                         padding: '10px 12px',
                         fontFamily: 'Inter, system-ui, sans-serif',
                         outline: 'none',
+                        boxSizing: 'border-box',
                       }}
                     />
                   )}
@@ -868,9 +1032,95 @@ function VideoCreator({ onBack }) {
             </div>
           </div>
 
+          {/* Music controls */}
+          <div
+            style={{
+              backgroundColor: BRAND.surface,
+              borderRadius: '16px',
+              border: `1px solid ${BRAND.border}`,
+              padding: '20px',
+            }}
+          >
+            <p style={{ color: BRAND.textMuted, fontSize: '12px', fontWeight: '600', letterSpacing: '1px', marginBottom: '14px', textTransform: 'uppercase' }}>
+              Background Music
+            </p>
+
+            {/* Toggle */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: BRAND.text, fontSize: '13px', fontWeight: '500' }}>
+                {musicEnabled ? <Music size={15} /> : <VolumeX size={15} />}
+                {musicEnabled ? 'Music on' : 'Music off'}
+              </div>
+              {/* Toggle switch */}
+              <button
+                onClick={() => setMusicEnabled(v => !v)}
+                style={{
+                  width: '42px',
+                  height: '24px',
+                  borderRadius: '12px',
+                  border: 'none',
+                  background: musicEnabled ? BRAND.primary : 'rgba(255,255,255,0.2)',
+                  cursor: 'pointer',
+                  position: 'relative',
+                  transition: 'background 0.2s',
+                  flexShrink: 0,
+                }}
+                aria-label="Toggle music"
+              >
+                <span
+                  style={{
+                    position: 'absolute',
+                    top: '3px',
+                    left: musicEnabled ? '21px' : '3px',
+                    width: '18px',
+                    height: '18px',
+                    borderRadius: '50%',
+                    background: '#FFFFFF',
+                    transition: 'left 0.2s',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+                  }}
+                />
+              </button>
+            </div>
+
+            {/* Mood selector */}
+            {musicEnabled && (
+              <div style={{ display: 'flex', gap: '8px' }}>
+                {MUSIC_MOODS.map((mood) => (
+                  <button
+                    key={mood.id}
+                    onClick={() => setSelectedMood(mood)}
+                    style={{
+                      flex: 1,
+                      padding: '8px 4px',
+                      borderRadius: '8px',
+                      border: selectedMood.id === mood.id
+                        ? `1px solid ${BRAND.primary}`
+                        : '1px solid rgba(255,255,255,0.12)',
+                      background: selectedMood.id === mood.id
+                        ? 'rgba(71,54,254,0.2)'
+                        : 'transparent',
+                      color: selectedMood.id === mood.id ? '#FFFFFF' : BRAND.textMuted,
+                      fontSize: '11px',
+                      fontWeight: selectedMood.id === mood.id ? '600' : '400',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s',
+                    }}
+                  >
+                    {mood.label}
+                  </button>
+                ))}
+              </div>
+            )}
+            {musicEnabled && (
+              <p style={{ color: BRAND.textMuted, fontSize: '11px', marginTop: '10px', lineHeight: '1.5' }}>
+                Music fades in/out on the 6-sec clip. Exported video file includes audio.
+              </p>
+            )}
+          </div>
+
           {/* Action buttons */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {/* Preview */}
             <button
               onClick={isPreviewPlaying ? stopPreview : startPreview}
               disabled={isRecording}
@@ -895,7 +1145,6 @@ function VideoCreator({ onBack }) {
               {isPreviewPlaying ? 'Stop Preview' : 'Preview Animation'}
             </button>
 
-            {/* Record / Generate */}
             {canRecord && (
               <button
                 onClick={startRecording}
@@ -925,7 +1174,6 @@ function VideoCreator({ onBack }) {
               </button>
             )}
 
-            {/* Download */}
             {downloadUrl && (
               <a
                 href={downloadUrl}
@@ -938,13 +1186,13 @@ function VideoCreator({ onBack }) {
                   padding: '14px',
                   borderRadius: '12px',
                   border: 'none',
-                  background: 'linear-gradient(135deg, #00C9A7 0%, #00FFAA 100%)',
-                  color: '#000',
+                  background: `linear-gradient(135deg, ${BRAND.primary} 0%, ${BRAND.primaryDark} 100%)`,
+                  color: '#FFFFFF',
                   fontSize: '14px',
                   fontWeight: '700',
                   cursor: 'pointer',
                   textDecoration: 'none',
-                  boxShadow: '0 4px 16px rgba(0,255,170,0.35)',
+                  boxShadow: `0 4px 16px rgba(71,54,254,0.45)`,
                 }}
               >
                 <Download size={16} />
@@ -969,7 +1217,7 @@ function VideoCreator({ onBack }) {
             }}
           >
             <p style={{ color: BRAND.textMuted, fontSize: '12px', fontWeight: '600', letterSpacing: '1px', textTransform: 'uppercase', alignSelf: 'flex-start' }}>
-              Preview — {VIDEO_W} × {VIDEO_H} · 6 sec
+              Preview — {VIDEO_W} x {VIDEO_H} · 6 sec
             </p>
             <canvas
               ref={canvasRef}
@@ -986,7 +1234,7 @@ function VideoCreator({ onBack }) {
             {isRecording && (
               <div style={{ width: '100%', maxWidth: '800px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', color: BRAND.textMuted, fontSize: '12px', marginBottom: '4px' }}>
-                  <span>Recording...</span>
+                  <span>Recording{musicEnabled ? ' (with audio)' : ''}...</span>
                   <span>{recordingProgress}%</span>
                 </div>
                 <div style={{ height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px' }}>
@@ -995,7 +1243,7 @@ function VideoCreator({ onBack }) {
               </div>
             )}
             {downloadUrl && !isRecording && (
-              <p style={{ color: BRAND.accent, fontSize: '13px', fontWeight: '600' }}>
+              <p style={{ color: BRAND.primary, fontSize: '13px', fontWeight: '600' }}>
                 Video ready! Click "Download" to save.
               </p>
             )}
@@ -1013,7 +1261,7 @@ function VideoCreator({ onBack }) {
               lineHeight: '1.6',
             }}
           >
-            <strong style={{ color: BRAND.text }}>How to use:</strong> Fill in the details on the left, click <strong style={{ color: BRAND.text }}>Preview Animation</strong> to watch the animated card, then click <strong style={{ color: BRAND.text }}>Generate Video</strong> to record it in real-time. When it finishes, click <strong style={{ color: BRAND.text }}>Download</strong> to save the file.
+            <strong style={{ color: BRAND.text }}>How to use:</strong> Fill in the details, optionally choose a music mood, then click <strong style={{ color: BRAND.text }}>Preview Animation</strong> to watch (with audio). Click <strong style={{ color: BRAND.text }}>Generate Video</strong> to record the 6-sec clip — the exported file includes music. Click <strong style={{ color: BRAND.text }}>Download</strong> to save.
           </div>
         </div>
       </div>
