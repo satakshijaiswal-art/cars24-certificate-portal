@@ -25,29 +25,23 @@ const W = 595;
 const H = 842;
 
 // ─── Cars24 logo — uniform component matching PosterCanvas treatment ──────────
-// onPurple=true  → white chip wrapper (purple hero/sidebar/footer backgrounds)
-// onPurple=false → direct render (white/light backgrounds)
-// height defaults to 32 — uniform across all JD templates
-const _logoSrc = import.meta.env.BASE_URL + 'cars24-logo.png';
+// invert=true  → on dark/colored background: use light variant (white logo)
+// invert=false → on white/light background: use dark variant (blue logo on transparent)
+const _logoDarkSrc  = import.meta.env.BASE_URL + 'cars24-logo-dark.png';  // blue on transparent
+const _logoLightSrc = import.meta.env.BASE_URL + 'cars24-logo-light.png'; // white on transparent
 const Logo = ({ height = 32, invert = false }) => {
   if (invert) {
+    // On colored/dark backgrounds — white wordmark, no wrapper needed (transparent bg)
     return (
-      <div style={{
-        background: '#FFFFFF',
-        borderRadius: 10,
-        padding: '6px 10px',
-        display: 'inline-block',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
-        lineHeight: 0,
-        flexShrink: 0,
-      }}>
-        <img src={_logoSrc} alt="Cars24" style={{ height, display: 'block', objectFit: 'contain' }} />
+      <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+        <img src={_logoLightSrc} alt="Cars24" style={{ height, display: 'block', objectFit: 'contain' }} crossOrigin="anonymous" />
       </div>
     );
   }
+  // On light/white backgrounds — blue wordmark on transparent bg
   return (
     <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-      <img src={_logoSrc} alt="Cars24" style={{ height, display: 'block', objectFit: 'contain' }} />
+      <img src={_logoDarkSrc} alt="Cars24" style={{ height, display: 'block', objectFit: 'contain' }} crossOrigin="anonymous" />
     </div>
   );
 };

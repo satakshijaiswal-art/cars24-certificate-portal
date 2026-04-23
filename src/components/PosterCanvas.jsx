@@ -29,29 +29,16 @@ const formatDate = (dateStr) => {
 };
 
 // ─── Shared Cars24 logo component ─────────────────────────────────────────────
-// onPurple=true  → white chip wrapper (for purple/dark backgrounds)
-// onPurple=false → direct render (for white/pale backgrounds)
-// height defaults to 32 — uniform across all poster templates
-const logoSrc = import.meta.env.BASE_URL + 'cars24-logo.png';
+// onPurple=true  → white logo on transparent bg (for dark/colored backgrounds)
+// onPurple=false → blue logo on transparent bg (for white/light backgrounds)
+const _logoDarkSrc  = import.meta.env.BASE_URL + 'cars24-logo-dark.png';  // blue on transparent
+const _logoLightSrc = import.meta.env.BASE_URL + 'cars24-logo-light.png'; // white on transparent
 const Cars24Logo = ({ onPurple = false, height = 32 }) => {
-  if (onPurple) {
-    return (
-      <div style={{
-        background: '#FFFFFF',
-        borderRadius: 10,
-        padding: '6px 10px',
-        display: 'inline-block',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
-        lineHeight: 0,
-      }}>
-        <img src={logoSrc} alt="Cars24" style={{ height, display: 'block', objectFit: 'contain' }} />
-      </div>
-    );
-  }
-  return <img src={logoSrc} alt="Cars24" style={{ height, display: 'block', objectFit: 'contain' }} />;
+  const src = onPurple ? _logoLightSrc : _logoDarkSrc;
+  return <img src={src} alt="Cars24" style={{ height, display: 'block', objectFit: 'contain' }} crossOrigin="anonymous" />;
 };
 
-// Aliases kept for internal use — both resolve to Cars24Logo
+// Aliases kept for internal use
 const Cars24LogoDark  = ({ height = 32 }) => <Cars24Logo onPurple={false} height={height} />;
 const Cars24LogoWhite = ({ height = 32 }) => <Cars24Logo onPurple={true}  height={height} />;
 

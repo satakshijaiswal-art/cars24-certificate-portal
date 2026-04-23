@@ -18,9 +18,10 @@ export default function Header({ user }) {
     >
       {/* Cars24 Logo */}
       <img
-        src={import.meta.env.BASE_URL + 'cars24-logo.png'}
+        src={import.meta.env.BASE_URL + 'cars24-logo-dark.png'}
         alt="Cars24"
         style={{ height: '28px', objectFit: 'contain' }}
+        crossOrigin="anonymous"
       />
 
       {/* Team name — no dropdown, no logout */}

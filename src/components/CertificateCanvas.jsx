@@ -17,9 +17,10 @@ const BarRaiserLayout = ({ template, formData }) => {
       {/* Cars24 Logo */}
       <div style={{ marginBottom: '48px' }}>
         <img
-          src={import.meta.env.BASE_URL + 'cars24-logo.png'}
+          src={import.meta.env.BASE_URL + 'cars24-logo-dark.png'}
           alt="Cars24"
           style={{ height: '32px', objectFit: 'contain' }}
+          crossOrigin="anonymous"
         />
       </div>
 

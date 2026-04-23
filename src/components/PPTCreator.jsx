@@ -963,7 +963,7 @@ function PPTCreator({ onBack }) {
 
                   {/* Cars24 Logo - positioned at top center */}
                   <img
-                    src={import.meta.env.BASE_URL + 'assets/logo.png'}
+                    src={import.meta.env.BASE_URL + 'cars24-logo-light.png'}
                     alt="Cars24 Logo"
                     style={{
                       position: 'absolute',
@@ -1365,7 +1365,7 @@ function PPTCreator({ onBack }) {
 
                   {/* Cars24 Logo - positioned at top center */}
                   <img
-                    src={import.meta.env.BASE_URL + 'assets/logo.png'}
+                    src={import.meta.env.BASE_URL + 'cars24-logo-light.png'}
                     alt="Cars24 Logo"
                     style={{
                       position: 'absolute',

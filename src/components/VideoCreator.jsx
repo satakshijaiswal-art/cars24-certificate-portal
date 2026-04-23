@@ -27,12 +27,13 @@ const DURATION_MS = 6000; // 6 seconds per video
 
 // ─── Music moods ──────────────────────────────────────────────────────────────
 // WAV files generated in public/audio/ — 8s synthetic tones, 100% royalty-free.
-// "Upbeat" and "Celebration" suit Birthday/Anniversary/Award/Welcome.
-// "Gentle" suits Farewell.
 const MUSIC_MOODS = [
-  { id: 'upbeat',      label: 'Upbeat',      file: 'upbeat.wav',      defaultFor: ['birthday','anniversary','welcome'] },
-  { id: 'celebration', label: 'Celebration', file: 'celebration.wav', defaultFor: ['award'] },
-  { id: 'gentle',      label: 'Gentle',      file: 'gentle.wav',      defaultFor: ['farewell'] },
+  { id: 'upbeat',            label: 'Upbeat',           file: 'upbeat.wav',            defaultFor: ['birthday','anniversary','welcome'] },
+  { id: 'celebration',       label: 'Celebration',      file: 'celebration.wav',       defaultFor: ['award'] },
+  { id: 'gentle',            label: 'Gentle',           file: 'gentle.wav',            defaultFor: ['farewell'] },
+  { id: 'energetic-techno',  label: 'Energetic Techno', file: 'energetic-techno.wav',  defaultFor: [] },
+  { id: 'festival-dhol',     label: 'Festival Dhol',    file: 'festival-dhol.wav',     defaultFor: ['festival'] },
+  { id: 'corporate-uplift',  label: 'Corporate Uplift', file: 'corporate-uplift.wav',  defaultFor: [] },
 ];
 
 function getMoodForTemplate(templateId) {
@@ -158,6 +159,7 @@ function drawParticles(ctx, t, color1, color2) {
 }
 
 // ─── Logo loader (singleton promise, cached after first load) ─────────────────
+// Video templates always use dark backgrounds → use the light variant (white logo on transparent bg)
 let _logoImg = null;
 let _logoPromise = null;
 
@@ -168,8 +170,15 @@ function getLogoImage(baseUrl) {
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = () => { _logoImg = img; resolve(img); };
-    img.onerror = () => resolve(null); // graceful fallback
-    img.src = (baseUrl || '/') + 'cars24-logo.png';
+    img.onerror = () => {
+      // Fallback to original if light variant not found
+      const fallback = new Image();
+      fallback.crossOrigin = 'anonymous';
+      fallback.onload = () => { _logoImg = fallback; resolve(fallback); };
+      fallback.onerror = () => resolve(null);
+      fallback.src = (baseUrl || '/') + 'cars24-logo.png';
+    };
+    img.src = (baseUrl || '/') + 'cars24-logo-light.png'; // white on transparent, correct for dark video bg
   });
   return _logoPromise;
 }
@@ -178,7 +187,7 @@ function getLogoImage(baseUrl) {
 let _cachedLogo = null;
 
 // Draw logo image in top-left; fallback to a text "Cars24" if image not loaded
-function drawLogoTopLeft(ctx, baseUrl) {
+function drawLogoTopLeft(ctx) {
   ctx.save();
   if (_cachedLogo) {
     // Logo is 1669×389 — draw at ~12% of canvas width, vertically proportional
@@ -198,6 +207,96 @@ function drawLogoTopLeft(ctx, baseUrl) {
   ctx.restore();
 }
 
+// ─── Video style variants ──────────────────────────────────────────────────────
+const VIDEO_STYLES = [
+  { id: 'minimal',        label: 'Minimal' },
+  { id: 'confetti-burst', label: 'Confetti Burst' },
+  { id: 'gradient-sweep', label: 'Gradient Sweep' },
+  { id: 'particle-stars', label: 'Particle Stars' },
+  { id: 'neon-grid',      label: 'Neon Grid' },
+];
+
+// Draw style overlay on top of existing canvas state
+function drawStyleOverlay(ctx, styleId, t, progress) {
+  if (styleId === 'minimal') return; // no overlay for minimal
+
+  if (styleId === 'confetti-burst') {
+    const count = 30;
+    for (let i = 0; i < count; i++) {
+      const seed = i * 53.7;
+      const life = ((t * 0.7 + i / count) % 1);
+      const x = ((seed * 29) % VIDEO_W);
+      const startY = VIDEO_H * 0.1;
+      const y = startY + life * VIDEO_H * 0.9;
+      const alpha = (1 - life) * 0.85;
+      const size = 6 + (seed % 8);
+      const colors = ['#4736FE', '#FFD700', '#FFFFFF', '#C4B5FD'];
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = colors[i % colors.length];
+      ctx.translate(x, y);
+      ctx.rotate(t * 3 + seed);
+      ctx.fillRect(-size / 2, -size / 4, size, size / 2);
+      ctx.restore();
+    }
+  }
+
+  if (styleId === 'gradient-sweep') {
+    const sweepX = (Math.sin(t * Math.PI) + 1) / 2 * VIDEO_W;
+    const grad = ctx.createLinearGradient(sweepX - 200, 0, sweepX + 200, VIDEO_H);
+    grad.addColorStop(0, 'rgba(71,54,254,0)');
+    grad.addColorStop(0.5, 'rgba(71,54,254,0.18)');
+    grad.addColorStop(1, 'rgba(71,54,254,0)');
+    ctx.save();
+    ctx.globalAlpha = 0.9;
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, VIDEO_W, VIDEO_H);
+    ctx.restore();
+  }
+
+  if (styleId === 'particle-stars') {
+    drawStars(ctx, t, 80, null);
+    const count = 12;
+    for (let i = 0; i < count; i++) {
+      const seed = i * 91.3;
+      const life = ((t * 0.5 + i / count) % 1);
+      const cx = VIDEO_W / 2 + Math.cos(seed * 2.1) * VIDEO_W * 0.4;
+      const cy = VIDEO_H / 2 + Math.sin(seed * 1.7) * VIDEO_H * 0.35;
+      const r = (1 - life) * 4 + 1;
+      ctx.save();
+      ctx.globalAlpha = (1 - life) * 0.9;
+      ctx.beginPath();
+      ctx.arc(cx + Math.cos(t + seed) * 30, cy + Math.sin(t * 1.3 + seed) * 20, r, 0, Math.PI * 2);
+      ctx.fillStyle = '#FFD700';
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  if (styleId === 'neon-grid') {
+    ctx.save();
+    ctx.globalAlpha = 0.12;
+    ctx.strokeStyle = '#4736FE';
+    ctx.lineWidth = 1;
+    const gridSize = 60;
+    const offset = (t * 20) % gridSize;
+    for (let x = -gridSize + offset; x < VIDEO_W + gridSize; x += gridSize) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, VIDEO_H); ctx.stroke();
+    }
+    for (let y = -gridSize + offset; y < VIDEO_H + gridSize; y += gridSize) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(VIDEO_W, y); ctx.stroke();
+    }
+    // Neon glow border
+    ctx.globalAlpha = 0.35;
+    ctx.strokeStyle = '#4736FE';
+    ctx.lineWidth = 3;
+    ctx.shadowColor = '#4736FE';
+    ctx.shadowBlur = 12;
+    ctx.strokeRect(12, 12, VIDEO_W - 24, VIDEO_H - 24);
+    ctx.restore();
+  }
+}
+
 function drawBg(ctx, gradColors, t) {
   const phase = (Math.sin(t * Math.PI * 2) + 1) / 2;
   const grd = ctx.createLinearGradient(0, 0, VIDEO_W, VIDEO_H);
@@ -211,7 +310,7 @@ function drawBg(ctx, gradColors, t) {
 }
 
 // ─── Birthday ──────────────────────────────────────────────────────────────────
-function drawBirthday(ctx, fields, t, progress) {
+function drawBirthday(ctx, fields, t, progress, styleId = 'minimal') {
   const { name = '', message = '' } = fields;
   drawBg(ctx, ['#c0392b', '#4736FE', '#c0392b'], t);
   drawStars(ctx, t, 40, null);
@@ -260,11 +359,12 @@ function drawBirthday(ctx, fields, t, progress) {
     ctx.restore();
   }
 
+  drawStyleOverlay(ctx, styleId, t, progress);
   drawLogoTopLeft(ctx);
 }
 
 // ─── Anniversary ───────────────────────────────────────────────────────────────
-function drawAnniversary(ctx, fields, t, progress) {
+function drawAnniversary(ctx, fields, t, progress, styleId = 'minimal') {
   const { name = '', years = '', message = '' } = fields;
   drawBg(ctx, ['#0f0a2e', '#4736FE', '#0f0a2e'], t);
   drawStars(ctx, t, 60, 'rgba(200,180,255,0.7)');
@@ -332,11 +432,12 @@ function drawAnniversary(ctx, fields, t, progress) {
     ctx.restore();
   }
 
+  drawStyleOverlay(ctx, styleId, t, progress);
   drawLogoTopLeft(ctx);
 }
 
 // ─── Welcome ───────────────────────────────────────────────────────────────────
-function drawWelcome(ctx, fields, t, progress) {
+function drawWelcome(ctx, fields, t, progress, styleId = 'minimal') {
   const { name = '', role = '', team = '' } = fields;
   drawBg(ctx, ['#0d0829', '#2B3990', '#0d0829'], t);
   drawStars(ctx, t, 30, 'rgba(180,170,255,0.5)');
@@ -408,11 +509,12 @@ function drawWelcome(ctx, fields, t, progress) {
   ctx.fillText('We\'re thrilled to have you at Cars24!', VIDEO_W / 2, VIDEO_H * 0.81);
   ctx.restore();
 
+  drawStyleOverlay(ctx, styleId, t, progress);
   drawLogoTopLeft(ctx);
 }
 
 // ─── Award ─────────────────────────────────────────────────────────────────────
-function drawAward(ctx, fields, t, progress) {
+function drawAward(ctx, fields, t, progress, styleId = 'minimal') {
   const { name = '', award = '', reason = '' } = fields;
   drawBg(ctx, ['#0d0829', '#4736FE', '#0d0829'], t);
   drawStars(ctx, t, 50, 'rgba(255,215,0,0.6)');
@@ -463,11 +565,12 @@ function drawAward(ctx, fields, t, progress) {
     ctx.restore();
   }
 
+  drawStyleOverlay(ctx, styleId, t, progress);
   drawLogoTopLeft(ctx);
 }
 
 // ─── Farewell ──────────────────────────────────────────────────────────────────
-function drawFarewell(ctx, fields, t, progress) {
+function drawFarewell(ctx, fields, t, progress, styleId = 'minimal') {
   const { name = '', message = '' } = fields;
   drawBg(ctx, ['#0d0829', '#2B3990', '#0d0829'], t);
   drawStars(ctx, t, 70, null);
@@ -517,6 +620,7 @@ function drawFarewell(ctx, fields, t, progress) {
     ctx.restore();
   }
 
+  drawStyleOverlay(ctx, styleId, t, progress);
   drawLogoTopLeft(ctx);
 }
 
@@ -555,6 +659,7 @@ function VideoCreator({ onBack }) {
   const [downloadFilename, setDownloadFilename] = useState('');
   const [recordingProgress, setRecordingProgress] = useState(0);
   const [supportNote, setSupportNote] = useState('');
+  const [selectedStyle, setSelectedStyle] = useState(VIDEO_STYLES[0]);
 
   // Music state
   const [musicEnabled, setMusicEnabled] = useState(true);
@@ -594,7 +699,7 @@ function VideoCreator({ onBack }) {
       // Re-draw the static first frame now that the logo is loaded
       if (!isRecording && !isPreviewPlaying && canvasRef.current) {
         const ctx = canvasRef.current.getContext('2d');
-        selectedTemplate.draw(ctx, fields, 0, 0.2);
+        selectedTemplate.draw(ctx, fields, 0, 0.2, selectedStyle.id);
       }
     });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -734,7 +839,7 @@ function VideoCreator({ onBack }) {
     const progress = Math.min(elapsed / DURATION_MS, 1);
     const t = elapsed / 1000;
 
-    selectedTemplate.draw(ctx, fields, t, progress);
+    selectedTemplate.draw(ctx, fields, t, progress, selectedStyle.id);
 
     if (isRecordingRun) {
       setRecordingProgress(Math.round(progress * 100));
@@ -752,7 +857,7 @@ function VideoCreator({ onBack }) {
         setIsPreviewPlaying(false);
       }
     }
-  }, [selectedTemplate, fields]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [selectedTemplate, fields, selectedStyle]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Preview
   const startPreview = useCallback(() => {
@@ -768,7 +873,7 @@ function VideoCreator({ onBack }) {
       startAudio(audioNodes);
       animate(ts, false);
     });
-  }, [animate, isRecording, musicEnabled, selectedMood]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [animate, isRecording, musicEnabled, selectedMood, selectedStyle]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const stopPreview = useCallback(() => {
     cancelAnimationFrame(animFrameRef.current);
@@ -777,9 +882,9 @@ function VideoCreator({ onBack }) {
     const canvas = canvasRef.current;
     if (canvas) {
       const ctx = canvas.getContext('2d');
-      selectedTemplate.draw(ctx, fields, 0, 0);
+      selectedTemplate.draw(ctx, fields, 0, 0, selectedStyle.id);
     }
-  }, [selectedTemplate, fields]);
+  }, [selectedTemplate, fields, selectedStyle]);
 
   // Record + download — combine canvas video track + audio track into MediaRecorder
   const startRecording = useCallback(() => {
@@ -839,7 +944,7 @@ function VideoCreator({ onBack }) {
       startAudio(audioNodes);
       animate(ts, true);
     });
-  }, [animate, selectedTemplate, fields, musicEnabled, selectedMood]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [animate, selectedTemplate, fields, musicEnabled, selectedMood, selectedStyle]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Draw static frame when template/fields change (not during recording)
   useEffect(() => {
@@ -847,8 +952,8 @@ function VideoCreator({ onBack }) {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    selectedTemplate.draw(ctx, fields, 0, 0.2);
-  }, [selectedTemplate, fields, isRecording, isPreviewPlaying]);
+    selectedTemplate.draw(ctx, fields, 0, 0.2, selectedStyle.id);
+  }, [selectedTemplate, fields, isRecording, isPreviewPlaying, selectedStyle]);
 
   // Reset fields when template changes
   useEffect(() => {
@@ -1117,6 +1222,46 @@ function VideoCreator({ onBack }) {
                 Music fades in/out on the 6-sec clip. Exported video file includes audio.
               </p>
             )}
+          </div>
+
+          {/* Style / Variant selector */}
+          <div
+            style={{
+              backgroundColor: BRAND.surface,
+              borderRadius: '16px',
+              border: `1px solid ${BRAND.border}`,
+              padding: '20px',
+            }}
+          >
+            <p style={{ color: BRAND.textMuted, fontSize: '12px', fontWeight: '600', letterSpacing: '1px', marginBottom: '12px', textTransform: 'uppercase' }}>
+              Visual Style
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+              {VIDEO_STYLES.map((style) => (
+                <button
+                  key={style.id}
+                  onClick={() => setSelectedStyle(style)}
+                  style={{
+                    padding: '7px 12px',
+                    borderRadius: '8px',
+                    border: selectedStyle.id === style.id
+                      ? `1px solid ${BRAND.primary}`
+                      : '1px solid rgba(255,255,255,0.12)',
+                    background: selectedStyle.id === style.id
+                      ? 'rgba(71,54,254,0.2)'
+                      : 'transparent',
+                    color: selectedStyle.id === style.id ? '#FFFFFF' : BRAND.textMuted,
+                    fontSize: '11px',
+                    fontWeight: selectedStyle.id === style.id ? '600' : '400',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {style.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Action buttons */}
