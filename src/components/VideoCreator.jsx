@@ -1190,13 +1190,17 @@ function VideoCreator({ onBack }) {
 
   // ─── Music state ─────────────────────────────────────────────────────────────
   const [musicEnabled, setMusicEnabled] = useState(true);
-  const [musicTracks, setMusicTracks] = useState([]);          // loaded from manifest
-  const [musicTab, setMusicTab] = useState('bollywood');       // active category tab
+  const [musicTracks, setMusicTracks] = useState([]);          // loaded from instrumental manifest
+  const [songTracks, setSongTracks] = useState([]);            // loaded from songs manifest
+  const [musicKind, setMusicKind] = useState('songs');         // 'songs' | 'instrumental'
+  const [musicTab, setMusicTab] = useState('bollywood');       // active instrumental tab
+  const [songTab, setSongTab] = useState('english');           // active song tab: 'hindi' | 'english'
   const [musicSearch, setMusicSearch] = useState('');          // search filter
   const [selectedTrack, setSelectedTrack] = useState(null);    // committed selection
   const [previewTrackId, setPreviewTrackId] = useState(null);  // currently previewing (not committed)
   const [musicVolume, setMusicVolume] = useState(70);          // 0-100
   const [musicTrimStart, setMusicTrimStart] = useState(0);     // 0-25 seconds
+  const [exportSilent, setExportSilent] = useState(false);     // silent export for Instagram
 
   const canvasRef = useRef(null);
   const animFrameRef = useRef(null);
@@ -1232,17 +1236,15 @@ function VideoCreator({ onBack }) {
     footer,
   };
 
-  // ─── Load manifest on mount ───────────────────────────────────────────────────
+  // ─── Load manifests on mount ─────────────────────────────────────────────────
   useEffect(() => {
     const baseUrl = import.meta.env.BASE_URL || '/';
+    // Load instrumental tracks
     fetch(baseUrl + 'music/manifest.json')
       .then(r => r.json())
       .then(data => {
         const tracks = data.tracks || data; // support both {tracks:[]} and raw array
         setMusicTracks(tracks);
-        // Set smart default based on template
-        const def = getDefaultTrack(tracks, VIDEO_TEMPLATES[0].id);
-        setSelectedTrack(def);
       })
       .catch(() => {
         // Fallback to old MUSIC_MOODS inline if manifest fails
@@ -1260,7 +1262,20 @@ function VideoCreator({ onBack }) {
           license: 'Royalty-free',
         }));
         setMusicTracks(fallback);
-        setSelectedTrack(fallback[0]);
+      });
+
+    // Load vocal songs
+    fetch(baseUrl + 'songs/manifest.json')
+      .then(r => r.json())
+      .then(data => {
+        const songs = data.songs || [];
+        setSongTracks(songs);
+        // Default to first English song for the songs picker
+        const firstEnglish = songs.find(s => s.language === 'english') || songs[0];
+        if (firstEnglish && !selectedTrack) setSelectedTrack(firstEnglish);
+      })
+      .catch(() => {
+        setSongTracks([]);
       });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -1325,6 +1340,11 @@ function VideoCreator({ onBack }) {
     setPreviewTrackId(null);
   }
 
+  function getTrackFolder(track) {
+    // Songs (vocal tracks) live in /songs/, instrumentals in /audio/
+    return track.language ? 'songs/' : 'audio/';
+  }
+
   function toggleTrackPreview(track) {
     const baseUrl = import.meta.env.BASE_URL || '/';
     if (previewTrackId === track.id) {
@@ -1338,20 +1358,21 @@ function VideoCreator({ onBack }) {
       el.crossOrigin = 'anonymous';
       previewAudioElRef.current = el;
     }
-    el.src = baseUrl + 'audio/' + track.file;
+    el.src = baseUrl + getTrackFolder(track) + track.file;
     el.currentTime = musicTrimStart;
     el.volume = musicVolume / 100;
     const p = el.play();
     if (p) p.catch(() => {});
     setPreviewTrackId(track.id);
-    // Auto-stop after 8s preview
+    // Auto-stop after 10s preview (longer for vocal songs so user can hear the vocals)
+    const previewDuration = track.language ? 10000 : 8000;
     setTimeout(() => {
       if (previewAudioElRef.current) {
         previewAudioElRef.current.pause();
         previewAudioElRef.current.currentTime = 0;
       }
       setPreviewTrackId(null);
-    }, 8000);
+    }, previewDuration);
   }
 
   function getBestMime() {
@@ -1372,7 +1393,7 @@ function VideoCreator({ onBack }) {
   }
 
   function setupAudio() {
-    if (!musicEnabled || !selectedTrack) return null;
+    if (!musicEnabled || !selectedTrack || exportSilent) return null;
     try {
       if (!audioCtxRef.current || audioCtxRef.current.state === 'closed') {
         audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
@@ -1406,7 +1427,7 @@ function VideoCreator({ onBack }) {
         audioElRef.current = audioEl;
       }
       const baseUrl = import.meta.env.BASE_URL || '/';
-      const newSrc = baseUrl + 'audio/' + selectedTrack.file;
+      const newSrc = baseUrl + getTrackFolder(selectedTrack) + selectedTrack.file;
       if (audioEl.src !== new URL(newSrc, window.location.href).href) {
         audioEl.src = newSrc;
       }
@@ -1422,12 +1443,15 @@ function VideoCreator({ onBack }) {
       if (playPromise) playPromise.catch(() => {});
       const targetGain = (musicVolume / 100) * 0.75;
       const durationSec = durationMs / 1000;
+      // Vocal songs get gentler 1s fade-in / 1s fade-out so vocals aren't clipped
+      // Instrumentals keep the tighter 200ms / 400ms crossfade
+      const isSong = !!(selectedTrack && selectedTrack.language);
+      const fadeIn = isSong ? 1.0 : 0.2;
+      const fadeOut = isSong ? 1.0 : 0.4;
       gainNode.gain.cancelScheduledValues(ctx.currentTime);
       gainNode.gain.setValueAtTime(0, ctx.currentTime);
-      // 200ms fade-in
-      gainNode.gain.linearRampToValueAtTime(targetGain, ctx.currentTime + 0.2);
-      gainNode.gain.setValueAtTime(targetGain, ctx.currentTime + durationSec - 0.4);
-      // 400ms fade-out
+      gainNode.gain.linearRampToValueAtTime(targetGain, ctx.currentTime + fadeIn);
+      gainNode.gain.setValueAtTime(targetGain, ctx.currentTime + durationSec - fadeOut);
       gainNode.gain.linearRampToValueAtTime(0, ctx.currentTime + durationSec);
     } catch (err) {
       console.warn('Audio start failed:', err);
@@ -1551,7 +1575,8 @@ function VideoCreator({ onBack }) {
       const url = URL.createObjectURL(blob);
       const name = selectedTemplate.label.toLowerCase().replace(/\s+/g, '-');
       const formatSuffix = selectedFormat.id === 'portrait' ? '-reels' : selectedFormat.id === 'square' ? '-square' : '';
-      const fname = `cars24-${name}-${(fields.name || 'video').toLowerCase().replace(/\s+/g, '-')}${formatSuffix}.${ext}`;
+      const silentSuffix = exportSilent ? '-silent' : '';
+      const fname = `cars24-${name}-${(fields.name || 'video').toLowerCase().replace(/\s+/g, '-')}${formatSuffix}${silentSuffix}.${ext}`;
       setDownloadUrl(url);
       setDownloadFilename(fname);
       setIsRecording(false);
@@ -1569,7 +1594,7 @@ function VideoCreator({ onBack }) {
       startAudio(audioNodes);
       animate(ts, true);
     });
-  }, [animate, selectedTemplate, fields, musicEnabled, selectedTrack, selectedStyle, drawOpts, durationMs, selectedFormat, musicVolume, musicTrimStart]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [animate, selectedTemplate, fields, musicEnabled, selectedTrack, selectedStyle, drawOpts, durationMs, selectedFormat, musicVolume, musicTrimStart, exportSilent]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Draw static frame when template/fields/opts change
   useEffect(() => {
@@ -1630,15 +1655,34 @@ function VideoCreator({ onBack }) {
     { id: 'festive',   label: 'Festive' },
   ];
 
-  const filteredTracks = musicTracks.filter(track => {
-    const inTab = track.section === musicTab;
-    if (!musicSearch.trim()) return inTab;
-    const q = musicSearch.toLowerCase();
-    return inTab && (
-      track.title.toLowerCase().includes(q) ||
-      track.vibe.toLowerCase().includes(q)
-    );
-  });
+  const SONG_TABS = [
+    { id: 'hindi',   label: 'Hindi' },
+    { id: 'english', label: 'English' },
+  ];
+
+  const filteredTracks = musicKind === 'instrumental'
+    ? musicTracks.filter(track => {
+        const inTab = track.section === musicTab;
+        if (!musicSearch.trim()) return inTab;
+        const q = musicSearch.toLowerCase();
+        return inTab && (
+          track.title.toLowerCase().includes(q) ||
+          (track.vibe || '').toLowerCase().includes(q)
+        );
+      })
+    : songTracks.filter(song => {
+        const inTab = song.language === songTab;
+        if (!musicSearch.trim()) return inTab;
+        const q = musicSearch.toLowerCase();
+        return inTab && (
+          song.title.toLowerCase().includes(q) ||
+          song.artist.toLowerCase().includes(q) ||
+          (song.vibe || '').toLowerCase().includes(q)
+        );
+      });
+
+  const hindiCount = songTracks.filter(s => s.language === 'hindi').length;
+  const englishSongCount = songTracks.filter(s => s.language === 'english').length;
 
   // ─── Shared input / style helpers ─────────────────────────────────────────
   const inputStyle = {
@@ -1994,7 +2038,7 @@ function VideoCreator({ onBack }) {
           {/* ─── Instagram-style Music Picker ─────────────────────────────────── */}
           <div style={sectionStyle}>
             {/* Header row: title + toggle */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 {musicEnabled ? <Music size={15} color={BRAND.primary} /> : <VolumeX size={15} color={BRAND.textMuted} />}
                 <p style={{ ...sectionTitleStyle, marginBottom: 0 }}>Background Music</p>
@@ -2020,29 +2064,91 @@ function VideoCreator({ onBack }) {
 
             {musicEnabled && (
               <>
-                {/* Category tab strip */}
-                <div style={{ display: 'flex', gap: '2px', marginBottom: '10px', background: 'rgba(255,255,255,0.04)', borderRadius: '10px', padding: '3px' }}>
-                  {TABS.map(tab => (
+                {/* ── Kind toggle: Songs (vocals) | Instrumentals ── */}
+                <div style={{ display: 'flex', gap: '6px', marginBottom: '10px' }}>
+                  {[
+                    { id: 'songs', label: 'Songs (with vocals)' },
+                    { id: 'instrumental', label: 'Instrumentals' },
+                  ].map(kind => (
                     <button
-                      key={tab.id}
-                      onClick={() => { setMusicTab(tab.id); setMusicSearch(''); }}
-                      style={{
-                        flex: 1, padding: '6px 4px', borderRadius: '8px', border: 'none',
-                        background: musicTab === tab.id ? BRAND.primary : 'transparent',
-                        color: musicTab === tab.id ? '#FFFFFF' : BRAND.textMuted,
-                        fontSize: '10px', fontWeight: '600', cursor: 'pointer',
-                        transition: 'all 0.15s', letterSpacing: '0.3px',
+                      key={kind.id}
+                      onClick={() => {
+                        setMusicKind(kind.id);
+                        setMusicSearch('');
+                        // When switching to instrumentals, default to first instrumental track
+                        if (kind.id === 'instrumental' && musicTracks.length > 0) {
+                          const curr = selectedTrack;
+                          if (!curr || curr.language) setSelectedTrack(musicTracks[0]);
+                        }
+                        // When switching to songs, default to first song
+                        if (kind.id === 'songs' && songTracks.length > 0) {
+                          const curr = selectedTrack;
+                          if (!curr || !curr.language) {
+                            const firstEn = songTracks.find(s => s.language === 'english') || songTracks[0];
+                            setSelectedTrack(firstEn);
+                          }
+                        }
                       }}
-                    >{tab.label}</button>
+                      style={{
+                        flex: 1, padding: '7px 6px', borderRadius: '10px', border: 'none',
+                        background: musicKind === kind.id ? BRAND.primary : 'rgba(255,255,255,0.06)',
+                        color: musicKind === kind.id ? '#FFFFFF' : BRAND.textMuted,
+                        fontSize: '10px', fontWeight: '700', cursor: 'pointer',
+                        transition: 'all 0.15s', letterSpacing: '0.2px',
+                      }}
+                    >{kind.label}</button>
                   ))}
                 </div>
+
+                {/* Royalty-free note */}
+                <p style={{ color: BRAND.primary, fontSize: '10px', fontStyle: 'italic', marginBottom: '8px', lineHeight: '1.5' }}>
+                  Songs are royalty-free and safe for Instagram. For chart songs, export silent and add music inside Instagram.
+                </p>
+
+                {/* ── Language/category tabs ── */}
+                {musicKind === 'songs' ? (
+                  <div style={{ display: 'flex', gap: '2px', marginBottom: '10px', background: 'rgba(255,255,255,0.04)', borderRadius: '10px', padding: '3px' }}>
+                    {SONG_TABS.map(tab => {
+                      const count = tab.id === 'hindi' ? hindiCount : englishSongCount;
+                      return (
+                        <button
+                          key={tab.id}
+                          onClick={() => { setSongTab(tab.id); setMusicSearch(''); }}
+                          style={{
+                            flex: 1, padding: '6px 4px', borderRadius: '8px', border: 'none',
+                            background: songTab === tab.id ? BRAND.primary : 'transparent',
+                            color: songTab === tab.id ? '#FFFFFF' : BRAND.textMuted,
+                            fontSize: '10px', fontWeight: '600', cursor: 'pointer',
+                            transition: 'all 0.15s', letterSpacing: '0.3px',
+                          }}
+                        >{tab.label} {count > 0 ? `(${count})` : ''}</button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', gap: '2px', marginBottom: '10px', background: 'rgba(255,255,255,0.04)', borderRadius: '10px', padding: '3px' }}>
+                    {TABS.map(tab => (
+                      <button
+                        key={tab.id}
+                        onClick={() => { setMusicTab(tab.id); setMusicSearch(''); }}
+                        style={{
+                          flex: 1, padding: '6px 4px', borderRadius: '8px', border: 'none',
+                          background: musicTab === tab.id ? BRAND.primary : 'transparent',
+                          color: musicTab === tab.id ? '#FFFFFF' : BRAND.textMuted,
+                          fontSize: '10px', fontWeight: '600', cursor: 'pointer',
+                          transition: 'all 0.15s', letterSpacing: '0.3px',
+                        }}
+                      >{tab.label}</button>
+                    ))}
+                  </div>
+                )}
 
                 {/* Search bar */}
                 <input
                   type="text"
                   value={musicSearch}
                   onChange={e => setMusicSearch(e.target.value)}
-                  placeholder="Search songs..."
+                  placeholder={musicKind === 'songs' ? 'Search songs...' : 'Search instrumentals...'}
                   style={{
                     ...inputStyle, marginBottom: '8px',
                     padding: '7px 11px', fontSize: '12px',
@@ -2058,6 +2164,7 @@ function VideoCreator({ onBack }) {
                   {filteredTracks.map(track => {
                     const isSelected = selectedTrack?.id === track.id;
                     const isPreviewing = previewTrackId === track.id;
+                    const isSongTrack = !!track.language;
                     return (
                       <div
                         key={track.id}
@@ -2082,7 +2189,7 @@ function VideoCreator({ onBack }) {
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                             transition: 'background 0.15s',
                           }}
-                          title={isPreviewing ? 'Stop preview' : 'Preview 8s'}
+                          title={isPreviewing ? 'Stop preview' : (isSongTrack ? 'Preview 10s' : 'Preview 8s')}
                         >
                           {isPreviewing
                             ? <span style={{ fontSize: '8px', letterSpacing: '1px' }}>❚❚</span>
@@ -2095,8 +2202,28 @@ function VideoCreator({ onBack }) {
                           <div style={{ color: isSelected ? '#FFFFFF' : BRAND.text, fontSize: '12px', fontWeight: '600', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                             {track.title}
                           </div>
-                          <div style={{ color: BRAND.textMuted, fontSize: '10px', marginTop: '1px' }}>
-                            {track.vibe} · {track.bpm} BPM
+                          <div style={{ color: BRAND.textMuted, fontSize: '10px', marginTop: '1px', display: 'flex', gap: '4px', alignItems: 'center', flexWrap: 'wrap' }}>
+                            {isSongTrack ? (
+                              <>
+                                <span>{track.artist}</span>
+                                <span style={{ opacity: 0.5 }}>·</span>
+                                <span style={{ background: 'rgba(71,54,254,0.25)', color: BRAND.primary, padding: '1px 5px', borderRadius: '4px', fontSize: '9px', fontWeight: '700' }}>
+                                  {track.language === 'hindi' ? 'HI' : 'EN'}
+                                </span>
+                                {track.hasVocals && (
+                                  <span style={{ background: 'rgba(71,54,254,0.15)', color: BRAND.primary, padding: '1px 5px', borderRadius: '4px', fontSize: '9px', fontWeight: '600' }}>
+                                    VOCAL
+                                  </span>
+                                )}
+                                {track.license && (
+                                  <span title={`License: ${track.credit || track.license}`} style={{ opacity: 0.6, fontSize: '9px', cursor: 'help' }}>
+                                    {track.license}
+                                  </span>
+                                )}
+                              </>
+                            ) : (
+                              <span>{track.vibe} · {track.bpm} BPM</span>
+                            )}
                           </div>
                         </div>
 
@@ -2122,12 +2249,21 @@ function VideoCreator({ onBack }) {
                   })}
                 </div>
 
-                {/* Selected track name */}
+                {/* Selected track name + credit */}
                 {selectedTrack && (
                   <div style={{ marginTop: '10px', padding: '8px 10px', background: 'rgba(71,54,254,0.1)', borderRadius: '8px', border: `1px solid rgba(71,54,254,0.3)` }}>
                     <span style={{ color: BRAND.textMuted, fontSize: '10px' }}>Selected: </span>
                     <span style={{ color: '#FFFFFF', fontSize: '11px', fontWeight: '600' }}>{selectedTrack.title}</span>
-                    <span style={{ color: BRAND.textMuted, fontSize: '10px' }}> · {selectedTrack.vibe}</span>
+                    {selectedTrack.language ? (
+                      <span style={{ color: BRAND.textMuted, fontSize: '10px' }}> · {selectedTrack.artist}</span>
+                    ) : (
+                      <span style={{ color: BRAND.textMuted, fontSize: '10px' }}> · {selectedTrack.vibe}</span>
+                    )}
+                    {selectedTrack.credit && (
+                      <div style={{ color: BRAND.textMuted, fontSize: '9px', marginTop: '3px', fontStyle: 'italic' }}>
+                        {selectedTrack.credit}
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -2171,9 +2307,41 @@ function VideoCreator({ onBack }) {
                   />
                 </div>
 
+                {/* Fade note — adapts based on kind */}
                 <p style={{ color: BRAND.textMuted, fontSize: '10px', marginTop: '8px', lineHeight: '1.5' }}>
-                  200ms fade-in · 400ms fade-out · audio baked into exported video
+                  {selectedTrack && selectedTrack.language
+                    ? '1s fade-in · 1s fade-out (gentler for vocals) · audio baked into exported video'
+                    : '200ms fade-in · 400ms fade-out · audio baked into exported video'
+                  }
                 </p>
+
+                {/* ── Silent export toggle ── */}
+                <div style={{ marginTop: '12px', padding: '10px', background: 'rgba(255,255,255,0.03)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                    <span style={{ color: BRAND.text, fontSize: '11px', fontWeight: '600' }}>
+                      {exportSilent ? 'Export silent (add music in Instagram)' : 'Export with audio'}
+                    </span>
+                    <button
+                      onClick={() => setExportSilent(v => !v)}
+                      style={{
+                        width: '38px', height: '22px', borderRadius: '11px', border: 'none',
+                        background: exportSilent ? '#2B3990' : BRAND.primary,
+                        cursor: 'pointer', position: 'relative', transition: 'background 0.2s', flexShrink: 0,
+                      }}
+                      aria-label="Toggle silent export"
+                    >
+                      <span style={{
+                        position: 'absolute', top: '2px',
+                        left: exportSilent ? '18px' : '2px',
+                        width: '18px', height: '18px', borderRadius: '50%',
+                        background: '#FFFFFF', transition: 'left 0.2s',
+                      }} />
+                    </button>
+                  </div>
+                  <p style={{ color: BRAND.textMuted, fontSize: '10px', lineHeight: '1.5', margin: 0, fontStyle: 'italic' }}>
+                    Choose silent if you want to use Instagram's music library when posting — gives you access to chart songs legally.
+                  </p>
+                </div>
               </>
             )}
           </div>
@@ -2285,9 +2453,13 @@ function VideoCreator({ onBack }) {
               <p style={{ color: BRAND.textMuted, fontSize: '12px', fontWeight: '600', letterSpacing: '1px', textTransform: 'uppercase' }}>
                 Preview — {selectedFormat.w} x {selectedFormat.h} · {selectedFormat.label} · {selectedDuration.label}
               </p>
-              {selectedTrack && musicEnabled && (
+              {exportSilent ? (
+                <span style={{ color: '#FFD700', fontSize: '11px', fontWeight: '500' }}>
+                  Silent export — add music in Instagram
+                </span>
+              ) : selectedTrack && musicEnabled && (
                 <span style={{ color: BRAND.primary, fontSize: '11px', fontWeight: '500' }}>
-                  {selectedTrack.title}
+                  {selectedTrack.title}{selectedTrack.language ? ` — ${selectedTrack.artist}` : ''}
                 </span>
               )}
             </div>
@@ -2300,7 +2472,7 @@ function VideoCreator({ onBack }) {
             {isRecording && (
               <div style={{ width: '100%', maxWidth: '800px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', color: BRAND.textMuted, fontSize: '12px', marginBottom: '4px' }}>
-                  <span>Recording{musicEnabled ? ` (${selectedTrack?.title || 'audio'})` : ''}...</span>
+                  <span>Recording{exportSilent ? ' (silent)' : musicEnabled ? ` (${selectedTrack?.title || 'audio'})` : ''}...</span>
                   <span>{recordingProgress}%</span>
                 </div>
                 <div style={{ height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px' }}>
@@ -2327,7 +2499,7 @@ function VideoCreator({ onBack }) {
               lineHeight: '1.6',
             }}
           >
-            <strong style={{ color: BRAND.text }}>How to use:</strong> Pick a template, fill in details, choose your music track (tap the play button to preview 8s), set Export Format to <strong style={{ color: BRAND.text }}>Reels (9:16)</strong> for Instagram, then click <strong style={{ color: BRAND.text }}>Generate Video</strong>. The file includes music with fade in/out baked in. Click <strong style={{ color: BRAND.text }}>Download</strong> to save.
+            <strong style={{ color: BRAND.text }}>How to use:</strong> Pick a template, fill in details, then choose <strong style={{ color: BRAND.text }}>Songs (with vocals)</strong> for real sung tracks or <strong style={{ color: BRAND.text }}>Instrumentals</strong> for background loops. Preview any track with the play button. Set Export Format to <strong style={{ color: BRAND.text }}>Reels (9:16)</strong> for Instagram. For chart songs (Arijit, Taylor Swift etc.) toggle <strong style={{ color: BRAND.text }}>Export silent</strong> and add music inside Instagram — that's fully legal via Instagram's own licensing.
           </div>
         </div>
       </div>
