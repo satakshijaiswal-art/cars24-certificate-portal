@@ -14,8 +14,16 @@ const BRAND = {
   bodyText: '#1C1C1C',
 };
 
-const VIDEO_W = 1280;
-const VIDEO_H = 720;
+// ─── Output format options ────────────────────────────────────────────────────
+const OUTPUT_FORMATS = [
+  { id: 'landscape', label: 'Landscape', sublabel: '16:9', w: 1280, h: 720,  aspectRatio: '16/9' },
+  { id: 'square',    label: 'Feed',      sublabel: '1:1',  w: 1080, h: 1080, aspectRatio: '1/1'  },
+  { id: 'portrait',  label: 'Reels',     sublabel: '9:16', w: 1080, h: 1920, aspectRatio: '9/16' },
+];
+
+// Resolved at runtime via selectedFormat
+let VIDEO_W = 1280;
+let VIDEO_H = 720;
 
 // ─── Duration options ─────────────────────────────────────────────────────────
 const DURATION_OPTIONS = [
@@ -179,6 +187,19 @@ const VIDEO_TEMPLATES = [
 function lerp(a, b, t) { return a + (b - a) * t; }
 function easeInOut(t) { return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t; }
 function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+
+// Scale font sizes based on current canvas width vs reference 1280px landscape
+// This ensures portrait (1080px wide) and square (1080px wide) render at correct scale
+function fs(basePx) {
+  const ref = 1280;
+  // For portrait (1920H), also factor in the height so text fills the tall canvas
+  const isPortraitCanvas = VIDEO_H > VIDEO_W;
+  if (isPortraitCanvas) {
+    // Use height-based scale for portrait so text is proportionally sized in the tall format
+    return Math.round(basePx * (VIDEO_H / 720) * 0.55);
+  }
+  return Math.round(basePx * (VIDEO_W / ref));
+}
 
 // ─── Background pattern renderer ─────────────────────────────────────────────
 function drawBackground(ctx, patternId, gradColors, t) {
@@ -459,9 +480,11 @@ let _cachedLogo = null;
 
 // Draw logo at configurable position
 function drawLogo(ctx, positionId) {
-  const logoW = Math.round(VIDEO_W * 0.12); // ~154px
+  // For portrait, use a smaller fraction of width so it doesn't dominate
+  const isPortraitCanvas = VIDEO_H > VIDEO_W;
+  const logoW = Math.round(VIDEO_W * (isPortraitCanvas ? 0.25 : 0.12));
   const logoH = Math.round(logoW * (389 / 1669));
-  const margin = 28;
+  const margin = fs(28);
   let x, y;
 
   switch (positionId) {
@@ -492,7 +515,7 @@ function drawLogo(ctx, positionId) {
   if (_cachedLogo) {
     ctx.drawImage(_cachedLogo, x, y, logoW, logoH);
   } else {
-    ctx.font = 'bold 22px Inter, system-ui, sans-serif';
+    ctx.font = `bold ${fs(22)}px Inter, system-ui, sans-serif`;
     ctx.fillStyle = 'rgba(255,255,255,0.85)';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
@@ -693,7 +716,7 @@ function drawBirthday(ctx, fields, t, progress, styleId = 'minimal', drawOpts = 
   const nameSlide = easeOut(Math.min(Math.max(progress * 3 - 0.5, 0), 1));
 
   ctx.save();
-  ctx.font = `${lerp(60, 90, easeInOut(Math.sin(t * Math.PI * 2) * 0.5 + 0.5))}px serif`;
+  ctx.font = `${lerp(fs(60), fs(90), easeInOut(Math.sin(t * Math.PI * 2) * 0.5 + 0.5))}px serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.globalAlpha = fadeIn;
@@ -702,7 +725,7 @@ function drawBirthday(ctx, fields, t, progress, styleId = 'minimal', drawOpts = 
 
   ctx.save();
   ctx.globalAlpha = fadeIn;
-  ctx.font = 'bold 56px Inter, system-ui, sans-serif';
+  ctx.font = `bold ${fs(56)}px Inter, system-ui, sans-serif`;
   ctx.fillStyle = '#FFFFFF';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
@@ -712,7 +735,7 @@ function drawBirthday(ctx, fields, t, progress, styleId = 'minimal', drawOpts = 
   if (name) {
     ctx.save();
     ctx.globalAlpha = nameSlide;
-    ctx.font = getNameFont(typography, 72);
+    ctx.font = getNameFont(typography, fs(72));
     ctx.fillStyle = accentColor;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -725,21 +748,21 @@ function drawBirthday(ctx, fields, t, progress, styleId = 'minimal', drawOpts = 
   if (message) {
     ctx.save();
     ctx.globalAlpha = Math.min(Math.max(progress * 3 - 1.2, 0), 1);
-    ctx.font = '28px Inter, system-ui, sans-serif';
+    ctx.font = `${fs(28)}px Inter, system-ui, sans-serif`;
     ctx.fillStyle = 'rgba(255,255,255,0.85)';
     ctx.textAlign = 'center';
-    wrapText(ctx, message, VIDEO_W / 2, VIDEO_H * 0.72, VIDEO_W * 0.7, 38);
+    wrapText(ctx, message, VIDEO_W / 2, VIDEO_H * 0.72, VIDEO_W * 0.7, fs(38));
     ctx.restore();
   }
 
   if (footer) {
     ctx.save();
     ctx.globalAlpha = Math.min(Math.max(progress * 3 - 1.5, 0), 1);
-    ctx.font = '20px Inter, system-ui, sans-serif';
+    ctx.font = `${fs(20)}px Inter, system-ui, sans-serif`;
     ctx.fillStyle = 'rgba(255,255,255,0.5)';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'bottom';
-    ctx.fillText(footer, VIDEO_W / 2, VIDEO_H - 40);
+    ctx.fillText(footer, VIDEO_W / 2, VIDEO_H - fs(40));
     ctx.restore();
   }
 
@@ -773,7 +796,7 @@ function drawAnniversary(ctx, fields, t, progress, styleId = 'minimal', drawOpts
   // Emoji (replacing fixed 🏆 position)
   ctx.save();
   ctx.globalAlpha = fadeIn;
-  ctx.font = `${lerp(50, 70, easeInOut(Math.sin(t * Math.PI * 2) * 0.5 + 0.5))}px serif`;
+  ctx.font = `${lerp(fs(50), fs(70), easeInOut(Math.sin(t * Math.PI * 2) * 0.5 + 0.5))}px serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(emoji, VIDEO_W / 2, VIDEO_H * 0.18);
@@ -784,8 +807,8 @@ function drawAnniversary(ctx, fields, t, progress, styleId = 'minimal', drawOpts
     ctx.globalAlpha = yearsSlide;
     const cx = VIDEO_W / 2;
     const cy = VIDEO_H * 0.33;
-    const radius = 65;
-    const grad = ctx.createRadialGradient(cx, cy, 10, cx, cy, radius);
+    const radius = fs(65);
+    const grad = ctx.createRadialGradient(cx, cy, fs(10), cx, cy, radius);
     grad.addColorStop(0, '#4736FE');
     grad.addColorStop(1, '#2B3990');
     ctx.beginPath();
@@ -795,20 +818,20 @@ function drawAnniversary(ctx, fields, t, progress, styleId = 'minimal', drawOpts
     ctx.strokeStyle = accentColor;
     ctx.lineWidth = 4;
     ctx.stroke();
-    ctx.font = 'bold 50px Inter, system-ui, sans-serif';
+    ctx.font = `bold ${fs(50)}px Inter, system-ui, sans-serif`;
     ctx.fillStyle = '#FFFFFF';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(years, cx, cy - 6);
-    ctx.font = '17px Inter, system-ui, sans-serif';
+    ctx.fillText(years, cx, cy - fs(6));
+    ctx.font = `${fs(17)}px Inter, system-ui, sans-serif`;
     ctx.fillStyle = 'rgba(255,255,255,0.8)';
-    ctx.fillText('YEAR' + (parseInt(years) !== 1 ? 'S' : ''), cx, cy + 26);
+    ctx.fillText('YEAR' + (parseInt(years) !== 1 ? 'S' : ''), cx, cy + fs(26));
     ctx.restore();
   }
 
   ctx.save();
   ctx.globalAlpha = fadeIn;
-  ctx.font = 'bold 46px Inter, system-ui, sans-serif';
+  ctx.font = `bold ${fs(46)}px Inter, system-ui, sans-serif`;
   ctx.fillStyle = '#FFFFFF';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
@@ -818,7 +841,7 @@ function drawAnniversary(ctx, fields, t, progress, styleId = 'minimal', drawOpts
   if (name) {
     ctx.save();
     ctx.globalAlpha = nameSlide;
-    ctx.font = getNameFont(typography, 62);
+    ctx.font = getNameFont(typography, fs(62));
     ctx.fillStyle = accentColor;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -831,21 +854,21 @@ function drawAnniversary(ctx, fields, t, progress, styleId = 'minimal', drawOpts
   if (message) {
     ctx.save();
     ctx.globalAlpha = Math.min(Math.max(progress * 3 - 1.4, 0), 1);
-    ctx.font = '26px Inter, system-ui, sans-serif';
+    ctx.font = `${fs(26)}px Inter, system-ui, sans-serif`;
     ctx.fillStyle = 'rgba(255,255,255,0.75)';
     ctx.textAlign = 'center';
-    wrapText(ctx, message, VIDEO_W / 2, VIDEO_H * 0.8, VIDEO_W * 0.72, 36);
+    wrapText(ctx, message, VIDEO_W / 2, VIDEO_H * 0.8, VIDEO_W * 0.72, fs(36));
     ctx.restore();
   }
 
   if (footer) {
     ctx.save();
     ctx.globalAlpha = Math.min(Math.max(progress * 3 - 1.5, 0), 1);
-    ctx.font = '20px Inter, system-ui, sans-serif';
+    ctx.font = `${fs(20)}px Inter, system-ui, sans-serif`;
     ctx.fillStyle = 'rgba(255,255,255,0.5)';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'bottom';
-    ctx.fillText(footer, VIDEO_W / 2, VIDEO_H - 40);
+    ctx.fillText(footer, VIDEO_W / 2, VIDEO_H - fs(40));
     ctx.restore();
   }
 
@@ -879,7 +902,7 @@ function drawWelcome(ctx, fields, t, progress, styleId = 'minimal', drawOpts = {
   ctx.save();
   ctx.globalAlpha = fadeIn;
   const wave = 1 + 0.15 * Math.sin(t * Math.PI * 4);
-  ctx.font = `${72 * wave}px serif`;
+  ctx.font = `${fs(72) * wave}px serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(emoji, VIDEO_W / 2, VIDEO_H * 0.22);
@@ -887,7 +910,7 @@ function drawWelcome(ctx, fields, t, progress, styleId = 'minimal', drawOpts = {
 
   ctx.save();
   ctx.globalAlpha = fadeIn;
-  ctx.font = 'bold 52px Inter, system-ui, sans-serif';
+  ctx.font = `bold ${fs(52)}px Inter, system-ui, sans-serif`;
   ctx.fillStyle = '#FFFFFF';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
@@ -897,7 +920,7 @@ function drawWelcome(ctx, fields, t, progress, styleId = 'minimal', drawOpts = {
   if (name) {
     ctx.save();
     ctx.globalAlpha = nameSlide;
-    ctx.font = getNameFont(typography, 68);
+    ctx.font = getNameFont(typography, fs(68));
     ctx.fillStyle = accentColor;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -911,14 +934,14 @@ function drawWelcome(ctx, fields, t, progress, styleId = 'minimal', drawOpts = {
     ctx.save();
     ctx.globalAlpha = roleSlide;
     const label = [role, team].filter(Boolean).join('  ·  ');
-    ctx.font = '32px Inter, system-ui, sans-serif';
+    ctx.font = `${fs(32)}px Inter, system-ui, sans-serif`;
     const textW = ctx.measureText(label).width;
-    const pillW = textW + 48;
-    const pillH = 52;
+    const pillW = textW + fs(48);
+    const pillH = fs(52);
     const pillX = VIDEO_W / 2 - pillW / 2;
     const pillY = VIDEO_H * 0.67 - pillH / 2;
     ctx.beginPath();
-    ctx.roundRect(pillX, pillY, pillW, pillH, 26);
+    ctx.roundRect(pillX, pillY, pillW, pillH, fs(26));
     ctx.fillStyle = 'rgba(71,54,254,0.3)';
     ctx.fill();
     ctx.strokeStyle = '#4736FE';
@@ -933,7 +956,7 @@ function drawWelcome(ctx, fields, t, progress, styleId = 'minimal', drawOpts = {
 
   ctx.save();
   ctx.globalAlpha = Math.min(Math.max(progress * 3 - 1.6, 0), 1);
-  ctx.font = '24px Inter, system-ui, sans-serif';
+  ctx.font = `${fs(24)}px Inter, system-ui, sans-serif`;
   ctx.fillStyle = 'rgba(255,255,255,0.6)';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
@@ -943,11 +966,11 @@ function drawWelcome(ctx, fields, t, progress, styleId = 'minimal', drawOpts = {
   if (footer) {
     ctx.save();
     ctx.globalAlpha = Math.min(Math.max(progress * 3 - 1.7, 0), 1);
-    ctx.font = '20px Inter, system-ui, sans-serif';
+    ctx.font = `${fs(20)}px Inter, system-ui, sans-serif`;
     ctx.fillStyle = 'rgba(255,255,255,0.5)';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'bottom';
-    ctx.fillText(footer, VIDEO_W / 2, VIDEO_H - 40);
+    ctx.fillText(footer, VIDEO_W / 2, VIDEO_H - fs(40));
     ctx.restore();
   }
 
@@ -981,7 +1004,7 @@ function drawAward(ctx, fields, t, progress, styleId = 'minimal', drawOpts = {})
   ctx.save();
   ctx.globalAlpha = fadeIn;
   const pulse = 1 + 0.08 * Math.sin(t * Math.PI * 3);
-  ctx.font = `${80 * pulse}px serif`;
+  ctx.font = `${fs(80) * pulse}px serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(emoji, VIDEO_W / 2, VIDEO_H * 0.2);
@@ -990,7 +1013,7 @@ function drawAward(ctx, fields, t, progress, styleId = 'minimal', drawOpts = {})
   // Headline above award title
   ctx.save();
   ctx.globalAlpha = fadeIn;
-  ctx.font = 'bold 36px Inter, system-ui, sans-serif';
+  ctx.font = `bold ${fs(36)}px Inter, system-ui, sans-serif`;
   ctx.fillStyle = '#FFFFFF';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
@@ -1000,20 +1023,20 @@ function drawAward(ctx, fields, t, progress, styleId = 'minimal', drawOpts = {})
   if (award) {
     ctx.save();
     ctx.globalAlpha = fadeIn;
-    ctx.font = 'bold 44px Inter, system-ui, sans-serif';
+    ctx.font = `bold ${fs(44)}px Inter, system-ui, sans-serif`;
     ctx.fillStyle = accentColor;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.shadowColor = accentColor + '88';
     ctx.shadowBlur = 16;
-    wrapText(ctx, award, VIDEO_W / 2, VIDEO_H * 0.44, VIDEO_W * 0.75, 54);
+    wrapText(ctx, award, VIDEO_W / 2, VIDEO_H * 0.44, VIDEO_W * 0.75, fs(54));
     ctx.restore();
   }
 
   if (name) {
     ctx.save();
     ctx.globalAlpha = nameSlide;
-    ctx.font = getNameFont(typography, 62);
+    ctx.font = getNameFont(typography, fs(62));
     ctx.fillStyle = '#FFFFFF';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -1024,21 +1047,21 @@ function drawAward(ctx, fields, t, progress, styleId = 'minimal', drawOpts = {})
   if (reason) {
     ctx.save();
     ctx.globalAlpha = reasonSlide;
-    ctx.font = '26px Inter, system-ui, sans-serif';
+    ctx.font = `${fs(26)}px Inter, system-ui, sans-serif`;
     ctx.fillStyle = 'rgba(255,255,255,0.8)';
     ctx.textAlign = 'center';
-    wrapText(ctx, reason, VIDEO_W / 2, VIDEO_H * 0.72, VIDEO_W * 0.68, 36);
+    wrapText(ctx, reason, VIDEO_W / 2, VIDEO_H * 0.72, VIDEO_W * 0.68, fs(36));
     ctx.restore();
   }
 
   if (footer) {
     ctx.save();
     ctx.globalAlpha = Math.min(Math.max(progress * 3 - 1.5, 0), 1);
-    ctx.font = '20px Inter, system-ui, sans-serif';
+    ctx.font = `${fs(20)}px Inter, system-ui, sans-serif`;
     ctx.fillStyle = 'rgba(255,255,255,0.5)';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'bottom';
-    ctx.fillText(footer, VIDEO_W / 2, VIDEO_H - 40);
+    ctx.fillText(footer, VIDEO_W / 2, VIDEO_H - fs(40));
     ctx.restore();
   }
 
@@ -1071,8 +1094,8 @@ function drawFarewell(ctx, fields, t, progress, styleId = 'minimal', drawOpts = 
 
   ctx.save();
   ctx.globalAlpha = fadeIn;
-  const drift = Math.sin(t * Math.PI * 2) * 10;
-  ctx.font = '80px serif';
+  const drift = Math.sin(t * Math.PI * 2) * fs(10);
+  ctx.font = `${fs(80)}px serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(emoji, VIDEO_W / 2 + drift, VIDEO_H * 0.2);
@@ -1080,7 +1103,7 @@ function drawFarewell(ctx, fields, t, progress, styleId = 'minimal', drawOpts = 
 
   ctx.save();
   ctx.globalAlpha = fadeIn;
-  ctx.font = 'bold 54px Inter, system-ui, sans-serif';
+  ctx.font = `bold ${fs(54)}px Inter, system-ui, sans-serif`;
   ctx.fillStyle = '#FFFFFF';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
@@ -1099,7 +1122,7 @@ function drawFarewell(ctx, fields, t, progress, styleId = 'minimal', drawOpts = 
   if (name) {
     ctx.save();
     ctx.globalAlpha = nameSlide;
-    ctx.font = getNameFont(typography, 66);
+    ctx.font = getNameFont(typography, fs(66));
     ctx.fillStyle = accentColor;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -1112,21 +1135,21 @@ function drawFarewell(ctx, fields, t, progress, styleId = 'minimal', drawOpts = 
   if (message) {
     ctx.save();
     ctx.globalAlpha = msgSlide;
-    ctx.font = '28px Inter, system-ui, sans-serif';
+    ctx.font = `${fs(28)}px Inter, system-ui, sans-serif`;
     ctx.fillStyle = 'rgba(255,255,255,0.75)';
     ctx.textAlign = 'center';
-    wrapText(ctx, message, VIDEO_W / 2, VIDEO_H * 0.74, VIDEO_W * 0.68, 38);
+    wrapText(ctx, message, VIDEO_W / 2, VIDEO_H * 0.74, VIDEO_W * 0.68, fs(38));
     ctx.restore();
   }
 
   if (footer) {
     ctx.save();
     ctx.globalAlpha = Math.min(Math.max(progress * 3 - 1.5, 0), 1);
-    ctx.font = '20px Inter, system-ui, sans-serif';
+    ctx.font = `${fs(20)}px Inter, system-ui, sans-serif`;
     ctx.fillStyle = 'rgba(255,255,255,0.5)';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'bottom';
-    ctx.fillText(footer, VIDEO_W / 2, VIDEO_H - 40);
+    ctx.fillText(footer, VIDEO_W / 2, VIDEO_H - fs(40));
     ctx.restore();
   }
 
@@ -1147,13 +1170,16 @@ function VideoCreator({ onBack }) {
   const [supportNote, setSupportNote] = useState('');
   const [selectedStyle, setSelectedStyle] = useState(VIDEO_STYLES[0]);
 
-  // New creative controls state
+  // Creative controls state
   const [bgPattern, setBgPattern] = useState('gradient');
   const [particleStyle, setParticleStyle] = useState('stars');
   const [typography, setTypography] = useState('modern-sans');
   const [logoPosition, setLogoPosition] = useState('top-left');
   const [border, setBorder] = useState('none');
-  const [selectedDuration, setSelectedDuration] = useState(DURATION_OPTIONS[1]); // 6s default
+  const [selectedDuration, setSelectedDuration] = useState(DURATION_OPTIONS[1]);
+
+  // Output format
+  const [selectedFormat, setSelectedFormat] = useState(OUTPUT_FORMATS[0]); // landscape default
 
   // Editable template fields
   const [headline, setHeadline] = useState(VIDEO_TEMPLATES[0].defaultHeadline);
@@ -1162,9 +1188,15 @@ function VideoCreator({ onBack }) {
   const [accentColor, setAccentColor] = useState('#FFD700');
   const [showEmojiPalette, setShowEmojiPalette] = useState(false);
 
-  // Music state
+  // ─── Music state ─────────────────────────────────────────────────────────────
   const [musicEnabled, setMusicEnabled] = useState(true);
-  const [selectedMood, setSelectedMood] = useState(() => getMoodForTemplate(VIDEO_TEMPLATES[0].id));
+  const [musicTracks, setMusicTracks] = useState([]);          // loaded from manifest
+  const [musicTab, setMusicTab] = useState('bollywood');       // active category tab
+  const [musicSearch, setMusicSearch] = useState('');          // search filter
+  const [selectedTrack, setSelectedTrack] = useState(null);    // committed selection
+  const [previewTrackId, setPreviewTrackId] = useState(null);  // currently previewing (not committed)
+  const [musicVolume, setMusicVolume] = useState(70);          // 0-100
+  const [musicTrimStart, setMusicTrimStart] = useState(0);     // 0-25 seconds
 
   const canvasRef = useRef(null);
   const animFrameRef = useRef(null);
@@ -1175,14 +1207,19 @@ function VideoCreator({ onBack }) {
 
   // Audio refs
   const audioElRef = useRef(null);
+  const previewAudioElRef = useRef(null);  // for track preview (separate element)
   const audioCtxRef = useRef(null);
   const gainNodeRef = useRef(null);
   const mediaDestRef = useRef(null);
 
-  // Computed duration in ms from selected duration option
+  // Sync VIDEO_W / VIDEO_H globals from selected format
+  VIDEO_W = selectedFormat.w;
+  VIDEO_H = selectedFormat.h;
+
+  // Computed duration
   const durationMs = selectedDuration.ms;
 
-  // Build drawOpts object for passing to draw functions
+  // Build drawOpts
   const drawOpts = {
     bgPattern,
     particleStyle,
@@ -1195,7 +1232,47 @@ function VideoCreator({ onBack }) {
     footer,
   };
 
-  // Detect codec support once on mount
+  // ─── Load manifest on mount ───────────────────────────────────────────────────
+  useEffect(() => {
+    const baseUrl = import.meta.env.BASE_URL || '/';
+    fetch(baseUrl + 'music/manifest.json')
+      .then(r => r.json())
+      .then(data => {
+        const tracks = data.tracks || data; // support both {tracks:[]} and raw array
+        setMusicTracks(tracks);
+        // Set smart default based on template
+        const def = getDefaultTrack(tracks, VIDEO_TEMPLATES[0].id);
+        setSelectedTrack(def);
+      })
+      .catch(() => {
+        // Fallback to old MUSIC_MOODS inline if manifest fails
+        const fallback = MUSIC_MOODS.map(m => ({
+          id: m.id,
+          title: m.label,
+          section: 'bollywood',
+          sectionLabel: 'Bollywood',
+          vibe: m.label,
+          bpm: 120,
+          duration: 30,
+          file: m.file,
+          moodTags: m.defaultFor,
+          defaultFor: m.defaultFor,
+          license: 'Royalty-free',
+        }));
+        setMusicTracks(fallback);
+        setSelectedTrack(fallback[0]);
+      });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  function getDefaultTrack(tracks, templateId) {
+    const byDefault = tracks.find(t => t.defaultFor && t.defaultFor.includes(templateId));
+    if (byDefault) return byDefault;
+    const byMoodTag = tracks.find(t => t.moodTags && t.moodTags.includes(templateId));
+    if (byMoodTag) return byMoodTag;
+    return tracks[0] || null;
+  }
+
+  // Detect codec support
   useEffect(() => {
     const mp4 = MediaRecorder.isTypeSupported('video/mp4;codecs=avc1');
     const webm = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
@@ -1208,7 +1285,7 @@ function VideoCreator({ onBack }) {
     }
   }, []);
 
-  // Pre-load the Cars24 logo image
+  // Pre-load logo
   useEffect(() => {
     const baseUrl = import.meta.env.BASE_URL || '/';
     getLogoImage(baseUrl).then((img) => {
@@ -1220,10 +1297,62 @@ function VideoCreator({ onBack }) {
     });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Update default mood when template changes
+  // Update default track when template changes
   useEffect(() => {
-    setSelectedMood(getMoodForTemplate(selectedTemplate.id));
-  }, [selectedTemplate]);
+    if (musicTracks.length > 0) {
+      const def = getDefaultTrack(musicTracks, selectedTemplate.id);
+      setSelectedTrack(def);
+    }
+  }, [selectedTemplate, musicTracks]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Update canvas size when format changes
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || isRecording || isPreviewPlaying) return;
+    canvas.width = selectedFormat.w;
+    canvas.height = selectedFormat.h;
+    const ctx = canvas.getContext('2d');
+    selectedTemplate.draw(ctx, fields, 0, 0.2, selectedStyle.id, drawOpts);
+  }, [selectedFormat]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Stop track preview when user leaves music picker or picks another track
+  function stopTrackPreview() {
+    const el = previewAudioElRef.current;
+    if (el) {
+      el.pause();
+      el.currentTime = 0;
+    }
+    setPreviewTrackId(null);
+  }
+
+  function toggleTrackPreview(track) {
+    const baseUrl = import.meta.env.BASE_URL || '/';
+    if (previewTrackId === track.id) {
+      stopTrackPreview();
+      return;
+    }
+    stopTrackPreview();
+    let el = previewAudioElRef.current;
+    if (!el) {
+      el = document.createElement('audio');
+      el.crossOrigin = 'anonymous';
+      previewAudioElRef.current = el;
+    }
+    el.src = baseUrl + 'audio/' + track.file;
+    el.currentTime = musicTrimStart;
+    el.volume = musicVolume / 100;
+    const p = el.play();
+    if (p) p.catch(() => {});
+    setPreviewTrackId(track.id);
+    // Auto-stop after 8s preview
+    setTimeout(() => {
+      if (previewAudioElRef.current) {
+        previewAudioElRef.current.pause();
+        previewAudioElRef.current.currentTime = 0;
+      }
+      setPreviewTrackId(null);
+    }, 8000);
+  }
 
   function getBestMime() {
     const candidates = [
@@ -1243,7 +1372,7 @@ function VideoCreator({ onBack }) {
   }
 
   function setupAudio() {
-    if (!musicEnabled) return null;
+    if (!musicEnabled || !selectedTrack) return null;
     try {
       if (!audioCtxRef.current || audioCtxRef.current.state === 'closed') {
         audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
@@ -1265,7 +1394,7 @@ function VideoCreator({ onBack }) {
   }
 
   function startAudio(audioNodes) {
-    if (!audioNodes) return;
+    if (!audioNodes || !selectedTrack) return;
     const { gainNode } = audioNodes;
     const ctx = audioCtxRef.current;
     try {
@@ -1277,7 +1406,7 @@ function VideoCreator({ onBack }) {
         audioElRef.current = audioEl;
       }
       const baseUrl = import.meta.env.BASE_URL || '/';
-      const newSrc = baseUrl + 'audio/' + selectedMood.file;
+      const newSrc = baseUrl + 'audio/' + selectedTrack.file;
       if (audioEl.src !== new URL(newSrc, window.location.href).href) {
         audioEl.src = newSrc;
       }
@@ -1287,15 +1416,18 @@ function VideoCreator({ onBack }) {
       }
       audioEl._sourceNode.disconnect();
       audioEl._sourceNode.connect(gainNode);
-      audioEl.currentTime = 0;
+      audioEl.currentTime = musicTrimStart;
       audioEl.volume = 1;
       const playPromise = audioEl.play();
       if (playPromise) playPromise.catch(() => {});
+      const targetGain = (musicVolume / 100) * 0.75;
       const durationSec = durationMs / 1000;
       gainNode.gain.cancelScheduledValues(ctx.currentTime);
       gainNode.gain.setValueAtTime(0, ctx.currentTime);
-      gainNode.gain.linearRampToValueAtTime(0.55, ctx.currentTime + 0.8);
-      gainNode.gain.setValueAtTime(0.55, ctx.currentTime + durationSec - 0.8);
+      // 200ms fade-in
+      gainNode.gain.linearRampToValueAtTime(targetGain, ctx.currentTime + 0.2);
+      gainNode.gain.setValueAtTime(targetGain, ctx.currentTime + durationSec - 0.4);
+      // 400ms fade-out
       gainNode.gain.linearRampToValueAtTime(0, ctx.currentTime + durationSec);
     } catch (err) {
       console.warn('Audio start failed:', err);
@@ -1324,11 +1456,9 @@ function VideoCreator({ onBack }) {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
-    const startTime = isRecordingRun ? startTimeRef.current : previewStartRef.current;
-    if (!startTime) {
-      if (isRecordingRun) startTimeRef.current = timestamp;
-      else previewStartRef.current = timestamp;
-    }
+    if (!startTimeRef.current && isRecordingRun) startTimeRef.current = timestamp;
+    if (!previewStartRef.current && !isRecordingRun) previewStartRef.current = timestamp;
+
     const elapsed = timestamp - (isRecordingRun ? startTimeRef.current : previewStartRef.current);
     const progress = Math.min(elapsed / durationMs, 1);
     const t = elapsed / 1000;
@@ -1355,6 +1485,7 @@ function VideoCreator({ onBack }) {
 
   const startPreview = useCallback(() => {
     if (isRecording) return;
+    stopTrackPreview();
     cancelAnimationFrame(animFrameRef.current);
     previewStartRef.current = null;
     setIsPreviewPlaying(true);
@@ -1364,7 +1495,7 @@ function VideoCreator({ onBack }) {
       startAudio(audioNodes);
       animate(ts, false);
     });
-  }, [animate, isRecording, musicEnabled, selectedMood, selectedStyle]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [animate, isRecording, musicEnabled, selectedTrack, selectedStyle]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const stopPreview = useCallback(() => {
     cancelAnimationFrame(animFrameRef.current);
@@ -1379,16 +1510,24 @@ function VideoCreator({ onBack }) {
 
   const startRecording = useCallback(() => {
     if (!canvasRef.current) return;
+    stopTrackPreview();
     cancelAnimationFrame(animFrameRef.current);
     setIsPreviewPlaying(false);
     stopAudio();
     setDownloadUrl(null);
     chunksRef.current = [];
 
+    // Apply format dimensions before capture
+    const canvas = canvasRef.current;
+    canvas.width = selectedFormat.w;
+    canvas.height = selectedFormat.h;
+    VIDEO_W = selectedFormat.w;
+    VIDEO_H = selectedFormat.h;
+
     const mime = getBestMime();
     const ext = getExtension(mime);
 
-    const videoStream = canvasRef.current.captureStream(30);
+    const videoStream = canvas.captureStream(30);
     let combinedStream = videoStream;
 
     const audioNodes = musicEnabled ? setupAudio() : null;
@@ -1411,7 +1550,8 @@ function VideoCreator({ onBack }) {
       const blob = new Blob(chunksRef.current, { type: mime });
       const url = URL.createObjectURL(blob);
       const name = selectedTemplate.label.toLowerCase().replace(/\s+/g, '-');
-      const fname = `cars24-${name}-${(fields.name || 'video').toLowerCase().replace(/\s+/g, '-')}.${ext}`;
+      const formatSuffix = selectedFormat.id === 'portrait' ? '-reels' : selectedFormat.id === 'square' ? '-square' : '';
+      const fname = `cars24-${name}-${(fields.name || 'video').toLowerCase().replace(/\s+/g, '-')}${formatSuffix}.${ext}`;
       setDownloadUrl(url);
       setDownloadFilename(fname);
       setIsRecording(false);
@@ -1429,18 +1569,22 @@ function VideoCreator({ onBack }) {
       startAudio(audioNodes);
       animate(ts, true);
     });
-  }, [animate, selectedTemplate, fields, musicEnabled, selectedMood, selectedStyle, drawOpts, durationMs]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [animate, selectedTemplate, fields, musicEnabled, selectedTrack, selectedStyle, drawOpts, durationMs, selectedFormat, musicVolume, musicTrimStart]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Draw static frame when template/fields/opts change (not during recording)
+  // Draw static frame when template/fields/opts change
   useEffect(() => {
     if (isRecording || isPreviewPlaying) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
+    canvas.width = selectedFormat.w;
+    canvas.height = selectedFormat.h;
+    VIDEO_W = selectedFormat.w;
+    VIDEO_H = selectedFormat.h;
     const ctx = canvas.getContext('2d');
     selectedTemplate.draw(ctx, fields, 0, 0.2, selectedStyle.id, drawOpts);
-  }, [selectedTemplate, fields, isRecording, isPreviewPlaying, selectedStyle, bgPattern, particleStyle, typography, logoPosition, border, accentColor, headline, emoji, footer]);
+  }, [selectedTemplate, fields, isRecording, isPreviewPlaying, selectedStyle, bgPattern, particleStyle, typography, logoPosition, border, accentColor, headline, emoji, footer, selectedFormat]);
 
-  // Reset fields and editable opts when template changes
+  // Reset when template changes
   useEffect(() => {
     setFields({});
     setDownloadUrl(null);
@@ -1451,11 +1595,8 @@ function VideoCreator({ onBack }) {
     setHeadline(selectedTemplate.defaultHeadline);
     setEmoji(selectedTemplate.defaultEmoji);
     setFooter('');
-    // Reset accent to gold for most, pale-violet for farewell
     setAccentColor(selectedTemplate.id === 'farewell' ? '#C4B5FD' : '#FFD700');
-    // Reset border default for award
     setBorder(selectedTemplate.id === 'award' ? 'glow' : 'none');
-    // Reset particle default
     const particleDefaults = {
       birthday: 'stars',
       anniversary: 'sparkles',
@@ -1471,6 +1612,7 @@ function VideoCreator({ onBack }) {
     return () => {
       cancelAnimationFrame(animFrameRef.current);
       stopAudio();
+      stopTrackPreview();
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -1480,7 +1622,25 @@ function VideoCreator({ onBack }) {
 
   const canRecord = typeof MediaRecorder !== 'undefined';
 
-  // ─── Shared input style ───────────────────────────────────────────────────────
+  // ─── Filtered track list for active tab + search ───────────────────────────
+  const TABS = [
+    { id: 'bollywood', label: 'Bollywood' },
+    { id: 'english',   label: 'English' },
+    { id: 'cinematic', label: 'Cinematic' },
+    { id: 'festive',   label: 'Festive' },
+  ];
+
+  const filteredTracks = musicTracks.filter(track => {
+    const inTab = track.section === musicTab;
+    if (!musicSearch.trim()) return inTab;
+    const q = musicSearch.toLowerCase();
+    return inTab && (
+      track.title.toLowerCase().includes(q) ||
+      track.vibe.toLowerCase().includes(q)
+    );
+  });
+
+  // ─── Shared input / style helpers ─────────────────────────────────────────
   const inputStyle = {
     width: '100%',
     background: '#1c1c1c',
@@ -1529,6 +1689,13 @@ function VideoCreator({ onBack }) {
     marginBottom: '14px',
     textTransform: 'uppercase',
   };
+
+  // ─── Canvas preview dimensions for display ────────────────────────────────
+  // Portrait gets a narrower display slot; landscape/square fill width
+  const isPortrait = selectedFormat.id === 'portrait';
+  const canvasDisplayStyle = isPortrait
+    ? { width: 'auto', height: '480px', maxHeight: '480px', borderRadius: '8px', background: '#000', display: 'block', margin: '0 auto' }
+    : { width: '100%', maxWidth: '800px', borderRadius: '8px', background: '#000', aspectRatio: selectedFormat.aspectRatio };
 
   // ─── render ──────────────────────────────────────────────────────────────────
   return (
@@ -1616,12 +1783,11 @@ function VideoCreator({ onBack }) {
             </div>
           </div>
 
-          {/* Editable card fields — headline, emoji, accent, footer */}
+          {/* Editable card fields */}
           <div style={sectionStyle}>
             <p style={sectionTitleStyle}>Card Text</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
-              {/* Headline */}
               <div>
                 <label style={labelStyle}>Headline</label>
                 <input
@@ -1633,7 +1799,6 @@ function VideoCreator({ onBack }) {
                 />
               </div>
 
-              {/* Emoji */}
               <div>
                 <label style={labelStyle}>Emoji / Icon</label>
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
@@ -1662,14 +1827,9 @@ function VideoCreator({ onBack }) {
                 </div>
                 {showEmojiPalette && (
                   <div style={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: '6px',
-                    marginTop: '8px',
-                    padding: '10px',
-                    background: '#1c1c1c',
-                    border: '1px solid rgba(255,255,255,0.12)',
-                    borderRadius: '10px',
+                    display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '8px',
+                    padding: '10px', background: '#1c1c1c',
+                    border: '1px solid rgba(255,255,255,0.12)', borderRadius: '10px',
                   }}>
                     {EMOJI_PALETTE.map((em) => (
                       <button
@@ -1678,21 +1838,14 @@ function VideoCreator({ onBack }) {
                         style={{
                           background: emoji === em ? 'rgba(71,54,254,0.3)' : 'transparent',
                           border: emoji === em ? `1px solid ${BRAND.primary}` : '1px solid rgba(255,255,255,0.1)',
-                          borderRadius: '6px',
-                          padding: '5px',
-                          fontSize: '20px',
-                          cursor: 'pointer',
-                          lineHeight: 1,
+                          borderRadius: '6px', padding: '5px', fontSize: '20px', cursor: 'pointer', lineHeight: 1,
                         }}
-                      >
-                        {em}
-                      </button>
+                      >{em}</button>
                     ))}
                   </div>
                 )}
               </div>
 
-              {/* Accent color */}
               <div>
                 <label style={labelStyle}>Accent Color</label>
                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
@@ -1702,15 +1855,9 @@ function VideoCreator({ onBack }) {
                       onClick={() => setAccentColor(ac.hex)}
                       title={ac.label}
                       style={{
-                        width: '32px',
-                        height: '32px',
-                        borderRadius: '50%',
-                        border: accentColor === ac.hex
-                          ? '3px solid #FFFFFF'
-                          : '2px solid rgba(255,255,255,0.2)',
-                        background: ac.hex,
-                        cursor: 'pointer',
-                        flexShrink: 0,
+                        width: '32px', height: '32px', borderRadius: '50%',
+                        border: accentColor === ac.hex ? '3px solid #FFFFFF' : '2px solid rgba(255,255,255,0.2)',
+                        background: ac.hex, cursor: 'pointer', flexShrink: 0,
                         boxShadow: accentColor === ac.hex ? `0 0 0 2px ${BRAND.primary}` : 'none',
                         transition: 'box-shadow 0.15s',
                       }}
@@ -1719,7 +1866,6 @@ function VideoCreator({ onBack }) {
                 </div>
               </div>
 
-              {/* Footer line */}
               <div>
                 <label style={labelStyle}>Footer Line (optional)</label>
                 <input
@@ -1767,7 +1913,6 @@ function VideoCreator({ onBack }) {
             <p style={sectionTitleStyle}>Creative Controls</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '11px' }}>
 
-              {/* Background pattern */}
               <div>
                 <label style={labelStyle}>Background Pattern</label>
                 <select value={bgPattern} onChange={(e) => setBgPattern(e.target.value)} style={selectStyle}>
@@ -1775,7 +1920,6 @@ function VideoCreator({ onBack }) {
                 </select>
               </div>
 
-              {/* Particle style */}
               <div>
                 <label style={labelStyle}>Particle Style</label>
                 <select value={particleStyle} onChange={(e) => setParticleStyle(e.target.value)} style={selectStyle}>
@@ -1783,7 +1927,6 @@ function VideoCreator({ onBack }) {
                 </select>
               </div>
 
-              {/* Name typography */}
               <div>
                 <label style={labelStyle}>Name Typography</label>
                 <select value={typography} onChange={(e) => setTypography(e.target.value)} style={selectStyle}>
@@ -1791,7 +1934,6 @@ function VideoCreator({ onBack }) {
                 </select>
               </div>
 
-              {/* Logo position */}
               <div>
                 <label style={labelStyle}>Logo Position</label>
                 <select value={logoPosition} onChange={(e) => setLogoPosition(e.target.value)} style={selectStyle}>
@@ -1799,7 +1941,6 @@ function VideoCreator({ onBack }) {
                 </select>
               </div>
 
-              {/* Border */}
               <div>
                 <label style={labelStyle}>Border / Frame</label>
                 <select value={border} onChange={(e) => setBorder(e.target.value)} style={selectStyle}>
@@ -1807,7 +1948,6 @@ function VideoCreator({ onBack }) {
                 </select>
               </div>
 
-              {/* Duration */}
               <div>
                 <label style={labelStyle}>Duration</label>
                 <div style={{ display: 'flex', gap: '8px' }}>
@@ -1816,24 +1956,14 @@ function VideoCreator({ onBack }) {
                       key={d.label}
                       onClick={() => setSelectedDuration(d)}
                       style={{
-                        flex: 1,
-                        padding: '7px 4px',
-                        borderRadius: '8px',
-                        border: selectedDuration.ms === d.ms
-                          ? `1px solid ${BRAND.primary}`
-                          : '1px solid rgba(255,255,255,0.12)',
-                        background: selectedDuration.ms === d.ms
-                          ? 'rgba(71,54,254,0.2)'
-                          : 'transparent',
+                        flex: 1, padding: '7px 4px', borderRadius: '8px',
+                        border: selectedDuration.ms === d.ms ? `1px solid ${BRAND.primary}` : '1px solid rgba(255,255,255,0.12)',
+                        background: selectedDuration.ms === d.ms ? 'rgba(71,54,254,0.2)' : 'transparent',
                         color: selectedDuration.ms === d.ms ? '#FFFFFF' : BRAND.textMuted,
-                        fontSize: '12px',
-                        fontWeight: selectedDuration.ms === d.ms ? '600' : '400',
-                        cursor: 'pointer',
-                        transition: 'all 0.15s',
+                        fontSize: '12px', fontWeight: selectedDuration.ms === d.ms ? '600' : '400',
+                        cursor: 'pointer', transition: 'all 0.15s',
                       }}
-                    >
-                      {d.label}
-                    </button>
+                    >{d.label}</button>
                   ))}
                 </div>
               </div>
@@ -1849,100 +1979,230 @@ function VideoCreator({ onBack }) {
                   key={style.id}
                   onClick={() => setSelectedStyle(style)}
                   style={{
-                    padding: '7px 12px',
-                    borderRadius: '8px',
-                    border: selectedStyle.id === style.id
-                      ? `1px solid ${BRAND.primary}`
-                      : '1px solid rgba(255,255,255,0.12)',
-                    background: selectedStyle.id === style.id
-                      ? 'rgba(71,54,254,0.2)'
-                      : 'transparent',
+                    padding: '7px 12px', borderRadius: '8px',
+                    border: selectedStyle.id === style.id ? `1px solid ${BRAND.primary}` : '1px solid rgba(255,255,255,0.12)',
+                    background: selectedStyle.id === style.id ? 'rgba(71,54,254,0.2)' : 'transparent',
                     color: selectedStyle.id === style.id ? '#FFFFFF' : BRAND.textMuted,
-                    fontSize: '11px',
-                    fontWeight: selectedStyle.id === style.id ? '600' : '400',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s',
-                    whiteSpace: 'nowrap',
+                    fontSize: '11px', fontWeight: selectedStyle.id === style.id ? '600' : '400',
+                    cursor: 'pointer', transition: 'all 0.15s', whiteSpace: 'nowrap',
                   }}
-                >
-                  {style.label}
-                </button>
+                >{style.label}</button>
               ))}
             </div>
           </div>
 
-          {/* Music controls */}
+          {/* ─── Instagram-style Music Picker ─────────────────────────────────── */}
           <div style={sectionStyle}>
-            <p style={sectionTitleStyle}>Background Music</p>
-
+            {/* Header row: title + toggle */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: BRAND.text, fontSize: '13px', fontWeight: '500' }}>
-                {musicEnabled ? <Music size={15} /> : <VolumeX size={15} />}
-                {musicEnabled ? 'Music on' : 'Music off'}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                {musicEnabled ? <Music size={15} color={BRAND.primary} /> : <VolumeX size={15} color={BRAND.textMuted} />}
+                <p style={{ ...sectionTitleStyle, marginBottom: 0 }}>Background Music</p>
               </div>
               <button
                 onClick={() => setMusicEnabled(v => !v)}
                 style={{
-                  width: '42px',
-                  height: '24px',
-                  borderRadius: '12px',
-                  border: 'none',
+                  width: '42px', height: '24px', borderRadius: '12px', border: 'none',
                   background: musicEnabled ? BRAND.primary : 'rgba(255,255,255,0.2)',
-                  cursor: 'pointer',
-                  position: 'relative',
-                  transition: 'background 0.2s',
-                  flexShrink: 0,
+                  cursor: 'pointer', position: 'relative', transition: 'background 0.2s', flexShrink: 0,
                 }}
                 aria-label="Toggle music"
               >
-                <span
-                  style={{
-                    position: 'absolute',
-                    top: '3px',
-                    left: musicEnabled ? '21px' : '3px',
-                    width: '18px',
-                    height: '18px',
-                    borderRadius: '50%',
-                    background: '#FFFFFF',
-                    transition: 'left 0.2s',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
-                  }}
-                />
+                <span style={{
+                  position: 'absolute', top: '3px',
+                  left: musicEnabled ? '21px' : '3px',
+                  width: '18px', height: '18px', borderRadius: '50%',
+                  background: '#FFFFFF', transition: 'left 0.2s',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+                }} />
               </button>
             </div>
 
             {musicEnabled && (
-              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                {MUSIC_MOODS.map((mood) => (
-                  <button
-                    key={mood.id}
-                    onClick={() => setSelectedMood(mood)}
-                    style={{
-                      flex: '1 1 auto',
-                      minWidth: '80px',
-                      padding: '7px 4px',
-                      borderRadius: '8px',
-                      border: selectedMood.id === mood.id
-                        ? `1px solid ${BRAND.primary}`
-                        : '1px solid rgba(255,255,255,0.12)',
-                      background: selectedMood.id === mood.id
-                        ? 'rgba(71,54,254,0.2)'
-                        : 'transparent',
-                      color: selectedMood.id === mood.id ? '#FFFFFF' : BRAND.textMuted,
-                      fontSize: '11px',
-                      fontWeight: selectedMood.id === mood.id ? '600' : '400',
-                      cursor: 'pointer',
-                      transition: 'all 0.15s',
+              <>
+                {/* Category tab strip */}
+                <div style={{ display: 'flex', gap: '2px', marginBottom: '10px', background: 'rgba(255,255,255,0.04)', borderRadius: '10px', padding: '3px' }}>
+                  {TABS.map(tab => (
+                    <button
+                      key={tab.id}
+                      onClick={() => { setMusicTab(tab.id); setMusicSearch(''); }}
+                      style={{
+                        flex: 1, padding: '6px 4px', borderRadius: '8px', border: 'none',
+                        background: musicTab === tab.id ? BRAND.primary : 'transparent',
+                        color: musicTab === tab.id ? '#FFFFFF' : BRAND.textMuted,
+                        fontSize: '10px', fontWeight: '600', cursor: 'pointer',
+                        transition: 'all 0.15s', letterSpacing: '0.3px',
+                      }}
+                    >{tab.label}</button>
+                  ))}
+                </div>
+
+                {/* Search bar */}
+                <input
+                  type="text"
+                  value={musicSearch}
+                  onChange={e => setMusicSearch(e.target.value)}
+                  placeholder="Search songs..."
+                  style={{
+                    ...inputStyle, marginBottom: '8px',
+                    padding: '7px 11px', fontSize: '12px',
+                  }}
+                />
+
+                {/* Track list */}
+                <div style={{ maxHeight: '260px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '4px',
+                  scrollbarWidth: 'thin', scrollbarColor: `${BRAND.primary} transparent` }}>
+                  {filteredTracks.length === 0 && (
+                    <p style={{ color: BRAND.textMuted, fontSize: '12px', textAlign: 'center', padding: '20px 0' }}>No tracks found</p>
+                  )}
+                  {filteredTracks.map(track => {
+                    const isSelected = selectedTrack?.id === track.id;
+                    const isPreviewing = previewTrackId === track.id;
+                    return (
+                      <div
+                        key={track.id}
+                        onClick={() => { setSelectedTrack(track); stopTrackPreview(); }}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: '8px',
+                          padding: '9px 10px', borderRadius: '10px', cursor: 'pointer',
+                          border: isSelected ? `1px solid ${BRAND.primary}` : '1px solid transparent',
+                          background: isSelected ? 'rgba(71,54,254,0.15)' : 'rgba(255,255,255,0.03)',
+                          transition: 'all 0.15s',
+                        }}
+                        onMouseOver={e => { if (!isSelected) e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; }}
+                        onMouseOut={e => { if (!isSelected) e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; }}
+                      >
+                        {/* Play/pause preview button */}
+                        <button
+                          onClick={e => { e.stopPropagation(); toggleTrackPreview(track); }}
+                          style={{
+                            width: '28px', height: '28px', borderRadius: '50%', border: 'none',
+                            background: isPreviewing ? BRAND.primary : 'rgba(255,255,255,0.12)',
+                            color: '#FFFFFF', cursor: 'pointer', flexShrink: 0,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            transition: 'background 0.15s',
+                          }}
+                          title={isPreviewing ? 'Stop preview' : 'Preview 8s'}
+                        >
+                          {isPreviewing
+                            ? <span style={{ fontSize: '8px', letterSpacing: '1px' }}>❚❚</span>
+                            : <span style={{ fontSize: '10px', marginLeft: '1px' }}>▶</span>
+                          }
+                        </button>
+
+                        {/* Track info */}
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ color: isSelected ? '#FFFFFF' : BRAND.text, fontSize: '12px', fontWeight: '600', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {track.title}
+                          </div>
+                          <div style={{ color: BRAND.textMuted, fontSize: '10px', marginTop: '1px' }}>
+                            {track.vibe} · {track.bpm} BPM
+                          </div>
+                        </div>
+
+                        {/* Duration badge */}
+                        <span style={{
+                          color: BRAND.textMuted, fontSize: '10px', flexShrink: 0,
+                          background: 'rgba(255,255,255,0.06)', borderRadius: '4px', padding: '2px 5px',
+                        }}>
+                          {track.duration}s
+                        </span>
+
+                        {/* Selection checkmark */}
+                        <span style={{
+                          width: '16px', height: '16px', borderRadius: '50%', flexShrink: 0,
+                          border: `2px solid ${isSelected ? BRAND.primary : 'rgba(255,255,255,0.2)'}`,
+                          background: isSelected ? BRAND.primary : 'transparent',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        }}>
+                          {isSelected && <span style={{ color: '#fff', fontSize: '8px', lineHeight: 1 }}>✓</span>}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Selected track name */}
+                {selectedTrack && (
+                  <div style={{ marginTop: '10px', padding: '8px 10px', background: 'rgba(71,54,254,0.1)', borderRadius: '8px', border: `1px solid rgba(71,54,254,0.3)` }}>
+                    <span style={{ color: BRAND.textMuted, fontSize: '10px' }}>Selected: </span>
+                    <span style={{ color: '#FFFFFF', fontSize: '11px', fontWeight: '600' }}>{selectedTrack.title}</span>
+                    <span style={{ color: BRAND.textMuted, fontSize: '10px' }}> · {selectedTrack.vibe}</span>
+                  </div>
+                )}
+
+                {/* Trim start slider */}
+                <div style={{ marginTop: '12px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
+                    <label style={labelStyle}>Trim — Start at</label>
+                    <span style={{ color: BRAND.text, fontSize: '11px', fontWeight: '600' }}>{musicTrimStart}s</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={0}
+                    max={25}
+                    step={1}
+                    value={musicTrimStart}
+                    onChange={e => setMusicTrimStart(Number(e.target.value))}
+                    style={{ width: '100%', accentColor: BRAND.primary, cursor: 'pointer' }}
+                  />
+                  <p style={{ color: BRAND.textMuted, fontSize: '10px', marginTop: '3px' }}>
+                    Skip the intro — pick where in the track your video starts
+                  </p>
+                </div>
+
+                {/* Volume slider */}
+                <div style={{ marginTop: '10px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
+                    <label style={labelStyle}>Volume</label>
+                    <span style={{ color: BRAND.text, fontSize: '11px', fontWeight: '600' }}>{musicVolume}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    step={5}
+                    value={musicVolume}
+                    onChange={e => {
+                      setMusicVolume(Number(e.target.value));
+                      if (previewAudioElRef.current) previewAudioElRef.current.volume = Number(e.target.value) / 100;
                     }}
-                  >
-                    {mood.label}
-                  </button>
-                ))}
-              </div>
+                    style={{ width: '100%', accentColor: BRAND.primary, cursor: 'pointer' }}
+                  />
+                </div>
+
+                <p style={{ color: BRAND.textMuted, fontSize: '10px', marginTop: '8px', lineHeight: '1.5' }}>
+                  200ms fade-in · 400ms fade-out · audio baked into exported video
+                </p>
+              </>
             )}
-            {musicEnabled && (
-              <p style={{ color: BRAND.textMuted, fontSize: '11px', marginTop: '10px', lineHeight: '1.5' }}>
-                Music fades in/out. Exported video file includes audio.
+          </div>
+
+          {/* ─── Export format toggle ──────────────────────────────────────────── */}
+          <div style={sectionStyle}>
+            <p style={sectionTitleStyle}>Export Format</p>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              {OUTPUT_FORMATS.map(fmt => (
+                <button
+                  key={fmt.id}
+                  onClick={() => setSelectedFormat(fmt)}
+                  style={{
+                    flex: 1, padding: '9px 4px', borderRadius: '10px',
+                    border: selectedFormat.id === fmt.id ? `1px solid ${BRAND.primary}` : '1px solid rgba(255,255,255,0.12)',
+                    background: selectedFormat.id === fmt.id ? 'rgba(71,54,254,0.2)' : 'transparent',
+                    color: selectedFormat.id === fmt.id ? '#FFFFFF' : BRAND.textMuted,
+                    cursor: 'pointer', transition: 'all 0.15s', textAlign: 'center',
+                  }}
+                >
+                  <div style={{ fontSize: '11px', fontWeight: '700' }}>{fmt.label}</div>
+                  <div style={{ fontSize: '10px', opacity: 0.7, marginTop: '2px' }}>{fmt.sublabel}</div>
+                  <div style={{ fontSize: '9px', opacity: 0.5, marginTop: '1px' }}>{fmt.w}×{fmt.h}</div>
+                </button>
+              ))}
+            </div>
+            {selectedFormat.id === 'portrait' && (
+              <p style={{ color: BRAND.primary, fontSize: '11px', marginTop: '8px', fontWeight: '500' }}>
+                Reels/Stories format — optimised for Instagram vertical
               </p>
             )}
           </div>
@@ -1953,20 +2213,13 @@ function VideoCreator({ onBack }) {
               onClick={isPreviewPlaying ? stopPreview : startPreview}
               disabled={isRecording}
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                padding: '12px',
-                borderRadius: '12px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                padding: '12px', borderRadius: '12px',
                 border: '1px solid rgba(255,255,255,0.2)',
                 background: isPreviewPlaying ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.08)',
-                color: BRAND.text,
-                fontSize: '14px',
-                fontWeight: '600',
+                color: BRAND.text, fontSize: '14px', fontWeight: '600',
                 cursor: isRecording ? 'not-allowed' : 'pointer',
-                opacity: isRecording ? 0.5 : 1,
-                transition: 'all 0.2s',
+                opacity: isRecording ? 0.5 : 1, transition: 'all 0.2s',
               }}
             >
               {isPreviewPlaying ? <Square size={16} /> : <Play size={16} />}
@@ -1978,27 +2231,19 @@ function VideoCreator({ onBack }) {
                 onClick={startRecording}
                 disabled={isRecording || isPreviewPlaying}
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  padding: '14px',
-                  borderRadius: '12px',
-                  border: 'none',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                  padding: '14px', borderRadius: '12px', border: 'none',
                   background: isRecording
                     ? `linear-gradient(90deg, ${BRAND.primary} ${recordingProgress}%, rgba(71,54,254,0.3) ${recordingProgress}%)`
                     : BRAND.primary,
-                  color: BRAND.text,
-                  fontSize: '14px',
-                  fontWeight: '600',
+                  color: BRAND.text, fontSize: '14px', fontWeight: '600',
                   cursor: (isRecording || isPreviewPlaying) ? 'not-allowed' : 'pointer',
-                  opacity: isPreviewPlaying ? 0.5 : 1,
-                  transition: 'background 0.1s',
+                  opacity: isPreviewPlaying ? 0.5 : 1, transition: 'background 0.1s',
                   boxShadow: isRecording ? 'none' : '0 4px 16px rgba(71,54,254,0.4)',
                 }}
               >
                 <Video size={16} />
-                {isRecording ? `Generating... ${recordingProgress}%` : `Generate Video (${selectedDuration.label})`}
+                {isRecording ? `Generating... ${recordingProgress}%` : `Generate ${selectedFormat.sublabel} Video (${selectedDuration.label})`}
               </button>
             )}
 
@@ -2007,19 +2252,11 @@ function VideoCreator({ onBack }) {
                 href={downloadUrl}
                 download={downloadFilename}
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  padding: '14px',
-                  borderRadius: '12px',
-                  border: 'none',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                  padding: '14px', borderRadius: '12px', border: 'none',
                   background: `linear-gradient(135deg, ${BRAND.primary} 0%, ${BRAND.primaryDark} 100%)`,
-                  color: '#FFFFFF',
-                  fontSize: '14px',
-                  fontWeight: '700',
-                  cursor: 'pointer',
-                  textDecoration: 'none',
+                  color: '#FFFFFF', fontSize: '14px', fontWeight: '700',
+                  cursor: 'pointer', textDecoration: 'none',
                   boxShadow: `0 4px 16px rgba(71,54,254,0.45)`,
                 }}
               >
@@ -2044,25 +2281,26 @@ function VideoCreator({ onBack }) {
               gap: '12px',
             }}
           >
-            <p style={{ color: BRAND.textMuted, fontSize: '12px', fontWeight: '600', letterSpacing: '1px', textTransform: 'uppercase', alignSelf: 'flex-start' }}>
-              Preview — {VIDEO_W} x {VIDEO_H} · {selectedDuration.label}
-            </p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+              <p style={{ color: BRAND.textMuted, fontSize: '12px', fontWeight: '600', letterSpacing: '1px', textTransform: 'uppercase' }}>
+                Preview — {selectedFormat.w} x {selectedFormat.h} · {selectedFormat.label} · {selectedDuration.label}
+              </p>
+              {selectedTrack && musicEnabled && (
+                <span style={{ color: BRAND.primary, fontSize: '11px', fontWeight: '500' }}>
+                  {selectedTrack.title}
+                </span>
+              )}
+            </div>
             <canvas
               ref={canvasRef}
-              width={VIDEO_W}
-              height={VIDEO_H}
-              style={{
-                width: '100%',
-                maxWidth: '800px',
-                borderRadius: '8px',
-                background: '#000',
-                aspectRatio: '16/9',
-              }}
+              width={selectedFormat.w}
+              height={selectedFormat.h}
+              style={canvasDisplayStyle}
             />
             {isRecording && (
               <div style={{ width: '100%', maxWidth: '800px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', color: BRAND.textMuted, fontSize: '12px', marginBottom: '4px' }}>
-                  <span>Recording{musicEnabled ? ' (with audio)' : ''}...</span>
+                  <span>Recording{musicEnabled ? ` (${selectedTrack?.title || 'audio'})` : ''}...</span>
                   <span>{recordingProgress}%</span>
                 </div>
                 <div style={{ height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px' }}>
@@ -2089,7 +2327,7 @@ function VideoCreator({ onBack }) {
               lineHeight: '1.6',
             }}
           >
-            <strong style={{ color: BRAND.text }}>How to use:</strong> Fill in the details, set your headline, emoji, and creative options, then click <strong style={{ color: BRAND.text }}>Preview Animation</strong> to watch. Click <strong style={{ color: BRAND.text }}>Generate Video</strong> to record — the exported file includes music and runs for {selectedDuration.label}. Click <strong style={{ color: BRAND.text }}>Download</strong> to save.
+            <strong style={{ color: BRAND.text }}>How to use:</strong> Pick a template, fill in details, choose your music track (tap the play button to preview 8s), set Export Format to <strong style={{ color: BRAND.text }}>Reels (9:16)</strong> for Instagram, then click <strong style={{ color: BRAND.text }}>Generate Video</strong>. The file includes music with fade in/out baked in. Click <strong style={{ color: BRAND.text }}>Download</strong> to save.
           </div>
         </div>
       </div>
