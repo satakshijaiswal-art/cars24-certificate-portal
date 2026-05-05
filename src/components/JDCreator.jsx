@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import { ArrowLeft, Download, Briefcase } from 'lucide-react';
@@ -54,8 +54,12 @@ const sectionHeadStyle = {
   borderBottom: '1px solid rgba(255,255,255,0.08)',
 };
 
-// ─── Template thumbnail ───────────────────────────────────────────────────────
-function JDTemplateThumbnail({ template, selected, onClick }) {
+// ─── Template thumbnail — renders an actual miniature of the template ────────
+const THUMB_W = 184;       // visible thumbnail width (sidebar usable width)
+const THUMB_SCALE = THUMB_W / 595; // scale a real 595-wide A4 canvas down
+const THUMB_H = Math.round(842 * THUMB_SCALE); // matching A4 aspect ratio
+
+function JDTemplateThumbnail({ template, sampleForm, selected, onClick }) {
   return (
     <div
       onClick={onClick}
@@ -75,17 +79,23 @@ function JDTemplateThumbnail({ template, selected, onClick }) {
         if (!selected) e.currentTarget.style.border = '2px solid rgba(255,255,255,0.08)';
       }}
     >
+      {/* Live miniature preview — pointer-events disabled so it can't be clicked through */}
       <div style={{
-        width: '100%',
-        height: '90px',
-        background: 'linear-gradient(135deg, #4736FE 0%, #6B57FF 100%)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        width: `${THUMB_W}px`,
+        height: `${THUMB_H}px`,
         position: 'relative',
         overflow: 'hidden',
+        background: '#FFFFFF',
+        pointerEvents: 'none',
       }}>
-        <Briefcase size={28} color="rgba(255,255,255,0.6)" />
+        <div style={{
+          transform: `scale(${THUMB_SCALE})`,
+          transformOrigin: 'top left',
+          width: '595px',
+          height: '842px',
+        }}>
+          <JDCanvas template={template} form={sampleForm} />
+        </div>
       </div>
       <div style={{ padding: '8px 10px' }}>
         <p style={{ color: '#FFFFFF', fontSize: '11px', fontWeight: '600', margin: '0 0 2px 0' }}>
@@ -116,6 +126,10 @@ export default function JDCreator({ onBack }) {
   const [selectedTemplate, setSelectedTemplate] = useState(jdTemplates[0]);
   const [form, setForm] = useState(defaultJDForm());
   const [isDownloading, setIsDownloading] = useState(false);
+
+  // Stable sample form used for sidebar miniature previews (so each thumbnail
+  // shows what the actual template looks like, not just an icon).
+  const sampleForm = useMemo(() => defaultJDForm(), []);
 
   const canvasRef = useRef(null);
   const exportRef = useRef(null);
@@ -166,7 +180,7 @@ export default function JDCreator({ onBack }) {
 
       {/* ── Left sidebar — template picker ── */}
       <div style={{
-        width: '220px',
+        width: '212px',
         backgroundColor: '#161616',
         borderRight: '1px solid rgba(255,255,255,0.06)',
         display: 'flex',
@@ -209,11 +223,12 @@ export default function JDCreator({ onBack }) {
           <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '10px', fontWeight: '600', letterSpacing: '1px', textTransform: 'uppercase', margin: '0 0 10px 0' }}>
             Templates
           </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {jdTemplates.map((t) => (
               <JDTemplateThumbnail
                 key={t.id}
                 template={t}
+                sampleForm={sampleForm}
                 selected={selectedTemplate.id === t.id}
                 onClick={() => setSelectedTemplate(t)}
               />

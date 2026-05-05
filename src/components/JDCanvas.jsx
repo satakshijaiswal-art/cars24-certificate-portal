@@ -87,9 +87,9 @@ const BulletList = ({ text, color = B.textSecondary, fontSize = '11px', numbered
     <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
       {lines.map((line, i) => (
         <li key={i} style={{
-          display: 'flex', alignItems: 'flex-start', gap: '8px',
-          marginBottom: '4px', color,
-          fontSize, lineHeight: '1.65', fontFamily: FONT_BODY,
+          display: 'flex', alignItems: 'flex-start', gap: '7px',
+          marginBottom: '3px', color,
+          fontSize, lineHeight: '1.5', fontFamily: FONT_BODY,
         }}>
           {numbered
             ? <span style={{
@@ -197,14 +197,14 @@ const ApplyButton = ({ link }) => {
 const EditorialLayout = ({ form }) => (
   <div style={{ width: W, height: H, background: B.white, display: 'flex', flexDirection: 'column', fontFamily: FONT_BODY, overflow: 'hidden' }}>
 
-    {/* Header block — ~220px purple */}
+    {/* Header block — purple */}
     <div style={{
       background: B.heroGrad,
-      padding: '26px 36px 24px',
+      padding: '20px 32px 18px',
       flexShrink: 0,
       position: 'relative',
       overflow: 'hidden',
-      minHeight: '220px',
+      minHeight: '180px',
     }}>
       {/* Decorative rings */}
       <div style={{ position: 'absolute', right: '-60px', top: '-60px', width: '260px', height: '260px', borderRadius: '50%', border: '2px solid rgba(255,255,255,0.10)', pointerEvents: 'none' }} />
@@ -212,8 +212,8 @@ const EditorialLayout = ({ form }) => (
       <div style={{ position: 'absolute', right: '50px', bottom: '-40px', width: '200px', height: '200px', borderRadius: '50%', border: '1px solid rgba(255,255,255,0.07)', pointerEvents: 'none' }} />
 
       {/* Logo row + WE'RE HIRING badge */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', position: 'relative', zIndex: 1 }}>
-        <Logo height={32} invert />
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', position: 'relative', zIndex: 1 }}>
+        <Logo height={28} invert />
         <div style={{ textAlign: 'right' }}>
           <div style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', borderRadius: '20px', padding: '4px 14px', display: 'inline-block' }}>
             <span style={{ color: '#FFFFFF', fontSize: '8px', fontWeight: '700', letterSpacing: '2.5px', textTransform: 'uppercase', fontFamily: FONT_BODY }}>We're Hiring</span>
@@ -224,10 +224,10 @@ const EditorialLayout = ({ form }) => (
       {/* Eyebrow */}
       <Eyebrow color="rgba(255,255,255,0.5)">{form.eyebrow || 'Cars24 · Hiring · 2026'}</Eyebrow>
 
-      {/* Role title — Playfair 56px */}
+      {/* Role title */}
       <h1 style={{
-        color: '#FFFFFF', fontSize: '54px', fontWeight: '700',
-        margin: '0 0 14px 0', lineHeight: '1.05',
+        color: '#FFFFFF', fontSize: '44px', fontWeight: '700',
+        margin: '0 0 10px 0', lineHeight: '1.05',
         fontFamily: FONT_DISPLAY, letterSpacing: '-1px',
         maxWidth: '440px', position: 'relative', zIndex: 1,
       }}>
@@ -235,7 +235,7 @@ const EditorialLayout = ({ form }) => (
       </h1>
 
       {/* Thin white divider */}
-      <div style={{ width: '100%', height: '1px', background: 'rgba(255,255,255,0.15)', margin: '0 0 12px', position: 'relative', zIndex: 1 }} />
+      <div style={{ width: '100%', height: '1px', background: 'rgba(255,255,255,0.15)', margin: '0 0 10px', position: 'relative', zIndex: 1 }} />
 
       {/* Meta pills — outlined white */}
       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', position: 'relative', zIndex: 1 }}>
@@ -254,7 +254,7 @@ const EditorialLayout = ({ form }) => (
       {/* Left vertical rule */}
       <div style={{ width: '3px', background: `linear-gradient(180deg, ${B.primary}, ${B.primaryLighter}, transparent)`, flexShrink: 0, opacity: 0.35 }} />
 
-      <div style={{ flex: 1, padding: '18px 32px 14px 28px', display: 'flex', flexDirection: 'column', gap: '10px', overflow: 'hidden' }}>
+      <div style={{ flex: 1, padding: '12px 28px 10px 24px', display: 'flex', flexDirection: 'column', gap: '8px', overflow: 'hidden' }}>
 
         {/* Hook / pull-quote */}
         {(form.hook || form.pullQuote) && (
@@ -265,34 +265,34 @@ const EditorialLayout = ({ form }) => (
         {form.aboutRole && (
           <div>
             <Badge number={1} label="About the Role" />
-            <p style={{ color: B.textSecondary, fontSize: '11px', lineHeight: '1.75', margin: 0, fontFamily: FONT_BODY }}>
+            <p style={{ color: B.textSecondary, fontSize: '10px', lineHeight: '1.6', margin: 0, fontFamily: FONT_BODY }}>
               {form.aboutRole}
             </p>
           </div>
         )}
 
         {/* Two columns */}
-        <div style={{ display: 'flex', gap: '24px', flex: 1 }}>
-          <div style={{ flex: 1 }}>
+        <div style={{ display: 'flex', gap: '20px', flex: 1, minHeight: 0 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
             {form.responsibilities && (
               <div>
                 <Badge number={2} label="What You'll Do" />
-                <BulletList text={form.responsibilities} numbered />
+                <BulletList text={form.responsibilities} fontSize="9.5px" numbered />
               </div>
             )}
           </div>
           <div style={{ width: '1px', background: B.primaryPale, flexShrink: 0 }} />
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {form.requirements && (
               <div>
                 <Badge number={3} label="What You're Bringing" />
-                <BulletList text={form.requirements} />
+                <BulletList text={form.requirements} fontSize="9.5px" />
               </div>
             )}
             {form.perks && (
               <div>
                 <Badge number={4} label="What You'll Get" />
-                <BulletList text={form.perks} />
+                <BulletList text={form.perks} fontSize="9.5px" />
               </div>
             )}
           </div>
