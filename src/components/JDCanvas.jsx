@@ -167,24 +167,38 @@ const Divider = ({ color = B.primaryPale, my = '10px' }) => (
   <div style={{ width: '100%', height: '1px', background: color, margin: `${my} 0` }} />
 );
 
-// ─── Apply CTA button ─────────────────────────────────────────────────────────
+// ─── Apply CTA button — shows the actual email / URL the user provided ──────
 const ApplyButton = ({ link }) => {
   if (!link) return null;
   return (
     <div style={{
-      display: 'inline-block',
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: '8px',
       background: `linear-gradient(135deg, ${B.primary}, ${B.primaryLight})`,
       borderRadius: '24px',
-      padding: '9px 22px',
+      padding: '8px 16px',
       boxShadow: '0 4px 16px rgba(71,54,254,0.3)',
+      maxWidth: '100%',
     }}>
+      <span style={{
+        color: 'rgba(255,255,255,0.7)',
+        fontSize: '9px',
+        fontWeight: '700',
+        fontFamily: FONT_BODY,
+        letterSpacing: '1.2px',
+        textTransform: 'uppercase',
+        flexShrink: 0,
+      }}>Apply →</span>
       <span style={{
         color: '#FFFFFF',
         fontSize: '10.5px',
         fontWeight: '700',
         fontFamily: FONT_BODY,
-        letterSpacing: '0.3px',
-      }}>Apply Now →</span>
+        letterSpacing: '0.2px',
+        wordBreak: 'break-all',
+        lineHeight: '1.2',
+      }}>{link}</span>
     </div>
   );
 };
@@ -334,14 +348,14 @@ const EditorialLayout = ({ form }) => (
 const MagazineLayout = ({ form }) => (
   <div style={{ width: W, height: H, background: B.offWhite, display: 'flex', flexDirection: 'column', fontFamily: FONT_BODY, overflow: 'hidden' }}>
 
-    {/* Hero — full-bleed purple gradient, ~340px */}
+    {/* Hero — full-bleed purple gradient */}
     <div style={{
       background: B.heroGrad,
-      padding: '28px 40px 24px',
+      padding: '22px 40px 20px',
       flexShrink: 0,
       position: 'relative',
       overflow: 'hidden',
-      minHeight: '340px',
+      minHeight: '270px',
     }}>
       {/* Decorative circle compositions */}
       <div style={{ position: 'absolute', right: '-80px', top: '-80px', width: '340px', height: '340px', borderRadius: '50%', border: '2px solid rgba(255,255,255,0.09)', pointerEvents: 'none' }} />
@@ -352,8 +366,8 @@ const MagazineLayout = ({ form }) => (
       ))}
 
       {/* Logo row + JOIN CARS24 label */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '22px', position: 'relative', zIndex: 1 }}>
-        <Logo height={32} invert />
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', position: 'relative', zIndex: 1 }}>
+        <Logo height={28} invert />
         <div style={{ background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '20px', padding: '4px 14px' }}>
           <span style={{ color: '#FFFFFF', fontSize: '8px', fontWeight: '700', letterSpacing: '2px', textTransform: 'uppercase', fontFamily: FONT_BODY }}>Join Cars24</span>
         </div>
@@ -362,15 +376,15 @@ const MagazineLayout = ({ form }) => (
       {/* Eyebrow */}
       <Eyebrow color="rgba(255,255,255,0.5)">{form.eyebrow || 'Cars24 · Hiring · 2026'}</Eyebrow>
 
-      {/* Giant role title — Playfair 72px with gradient */}
+      {/* Role title */}
       <h1 style={{
         color: '#FFFFFF',
-        fontSize: '68px',
+        fontSize: '52px',
         fontWeight: '800',
-        margin: '0 0 12px 0',
-        lineHeight: '0.97',
+        margin: '0 0 10px 0',
+        lineHeight: '0.98',
         fontFamily: FONT_DISPLAY,
-        letterSpacing: '-1.5px',
+        letterSpacing: '-1.2px',
         maxWidth: '460px',
         position: 'relative',
         zIndex: 1,
@@ -380,7 +394,7 @@ const MagazineLayout = ({ form }) => (
 
       {/* Hook */}
       {form.hook && (
-        <p style={{ color: 'rgba(255,255,255,0.72)', fontSize: '13px', fontWeight: '400', margin: '0 0 16px 0', fontFamily: FONT_BODY, fontStyle: 'italic', position: 'relative', zIndex: 1 }}>
+        <p style={{ color: 'rgba(255,255,255,0.72)', fontSize: '12px', fontWeight: '400', margin: '0 0 12px 0', fontFamily: FONT_BODY, fontStyle: 'italic', position: 'relative', zIndex: 1, maxWidth: '460px' }}>
           {form.hook}
         </p>
       )}
@@ -399,14 +413,14 @@ const MagazineLayout = ({ form }) => (
     {/* Pull-quote / stat area */}
     {form.pullQuote && (
       <div style={{
-        padding: '14px 40px',
+        padding: '10px 40px',
         background: B.white,
         borderBottom: `1px solid ${B.primaryPale}`,
         flexShrink: 0,
       }}>
         <p style={{
           color: B.primary,
-          fontSize: '16px',
+          fontSize: '14px',
           fontWeight: '700',
           fontFamily: FONT_DISPLAY,
           fontStyle: 'italic',
@@ -419,12 +433,12 @@ const MagazineLayout = ({ form }) => (
     )}
 
     {/* White body — two columns */}
-    <div style={{ flex: 1, padding: '16px 40px', display: 'flex', gap: '28px', overflow: 'hidden', background: B.white }}>
-      <div style={{ flex: 1 }}>
+    <div style={{ flex: 1, padding: '12px 36px', display: 'flex', gap: '22px', overflow: 'hidden', background: B.white, minHeight: 0 }}>
+      <div style={{ flex: 1, minWidth: 0 }}>
         {form.aboutRole && (
-          <div style={{ marginBottom: '12px' }}>
+          <div style={{ marginBottom: '10px' }}>
             <Badge number={1} label="About the Role" />
-            <p style={{ color: B.textSecondary, fontSize: '11px', lineHeight: '1.75', margin: 0, fontFamily: FONT_BODY }}>
+            <p style={{ color: B.textSecondary, fontSize: '10px', lineHeight: '1.6', margin: 0, fontFamily: FONT_BODY }}>
               {form.aboutRole}
             </p>
           </div>
@@ -432,22 +446,22 @@ const MagazineLayout = ({ form }) => (
         {form.responsibilities && (
           <div>
             <Badge number={2} label="What You'll Do" />
-            <BulletList text={form.responsibilities} numbered />
+            <BulletList text={form.responsibilities} fontSize="9.5px" numbered />
           </div>
         )}
       </div>
       <div style={{ width: '1px', background: B.primaryPale, flexShrink: 0 }} />
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
         {form.requirements && (
           <div>
             <Badge number={3} label="What You're Bringing" />
-            <BulletList text={form.requirements} />
+            <BulletList text={form.requirements} fontSize="9.5px" />
           </div>
         )}
         {form.perks && (
           <div>
             <Badge number={4} label="What You'll Get" />
-            <BulletList text={form.perks} />
+            <BulletList text={form.perks} fontSize="9.5px" />
           </div>
         )}
       </div>
@@ -456,19 +470,24 @@ const MagazineLayout = ({ form }) => (
     {/* Footer */}
     <div style={{
       borderTop: `3px solid ${B.primary}`, background: B.white,
-      padding: '12px 40px',
+      padding: '12px 36px',
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      gap: '14px',
       flexShrink: 0,
     }}>
-      <div>
-        {form.applyLink ? <ApplyButton link={form.applyLink} /> : null}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        {form.applyLink ? (
+          <ApplyButton link={form.applyLink} />
+        ) : (
+          <p style={{ color: B.textSecondary, fontSize: '10px', margin: 0, fontFamily: FONT_BODY }}>careers.cars24.com</p>
+        )}
         {form.recruiterName && (
           <p style={{ color: B.textSecondary, fontSize: '9px', margin: '6px 0 0', fontFamily: FONT_BODY }}>
             {form.recruiterName}{form.recruiterTitle ? ` · ${form.recruiterTitle}` : ''}
           </p>
         )}
       </div>
-      <Logo height={32} />
+      <Logo height={28} />
     </div>
   </div>
 );
